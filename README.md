@@ -8,6 +8,13 @@
   <img src="docs/screenshots/remote_config.png" width="270" alt="手机助手 · 配置接口页" />
 </p>
 
+<p align="center">
+  <img src="docs/screenshots/tv_home.png" width="420" alt="电视端 · 首页" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/tv_detail.png" width="420" alt="电视端 · 详情页" />
+</p>
+<p align="center"><sub>上排：手机助手（搜索 / 配置接口）&nbsp;·&nbsp;下排：电视端（首页 / 详情页）</sub></p>
+
 ## 手机助手 · 全新 UI
 
 电视端内置的网页遥控（手机浏览器访问电视 IP 即可打开），整套界面推倒重做：
@@ -22,8 +29,8 @@
 ## 电视端 · 界面重做
 
 - **启动页**：新增 `SplashActivity` + `SplashTheme`（原来启动直接进 HomeActivity）
-- **首页重构**：豆瓣推荐流（`DoubanFragment` + `DoubanApi`）、海报卡片 `PosterCardLayout`、加载骨架屏 `SkeletonView`、背景大图 + 毛玻璃（`BackdropLoader` + `BlurUtil`）、`HomeCache` 缓存
-- **详情页重做**：评分胶囊（`bg_rate_pill`）、播放 / 收藏 / 更多操作（`ic_d_*`）、`DetailMoreDialog`
+- **首页重构**：豆瓣推荐流（`DoubanFragment` + `DoubanApi`）、左侧竖排图标栏 + 分类胶囊 + 海报墙（带豆瓣评分角标）、加载骨架屏 `SkeletonView`、背景大图 + 毛玻璃（`BackdropLoader` + `BlurUtil`）、`HomeCache` 缓存
+- **详情页重做**：视频预览窗口、播放线路 / 音轨 / 分辨率胶囊、分页选集网格、播放 / 收藏 / 更多操作（`ic_d_*`）、`DetailMoreDialog`
 - **横向栏目「更多」**：`RailMoreDialog`；**配置接口弹窗**：`ConfigApiDialog`
 - **全部对话框统一新视觉**（`dialog_*` 共 24 个）：玻璃卡片（`bg_glass_card`）、圆角胶囊、焦点选择器（`sel_pill_*` / `sel_setting_*`）
 - **新应用图标**（多密度）+ 默认背景 `app_bg.jpg`
