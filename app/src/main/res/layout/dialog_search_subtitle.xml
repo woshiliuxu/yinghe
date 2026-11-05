@@ -32,8 +32,8 @@
                 android:paddingTop="@dimen/vs_10"
                 android:paddingRight="@dimen/vs_2"
                 android:paddingBottom="@dimen/vs_10"
-                android:textColor="@color/color_FFFFFF"
-                android:textColorHint="@color/color_6CFFFFFF"
+                android:textColor="@color/dialog_text_main"
+                android:textColorHint="@color/dialog_hint"
                 android:textSize="@dimen/ts_26" />
 
             <TextView
@@ -48,7 +48,7 @@
                 android:gravity="center"
                 android:padding="@dimen/vs_10"
                 android:text="Search"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/dialog_text_main"
                 android:textSize="@dimen/ts_22" />
         </LinearLayout>
 

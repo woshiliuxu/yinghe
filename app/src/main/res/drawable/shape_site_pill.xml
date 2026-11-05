@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 详情页「来源站点」小胶囊：不可聚焦，纯标签，所以只有一个常态 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="@dimen/vs_15" />
+    <solid android:color="#0DFFFFFF" />
+    <stroke
+        android:width="1mm"
+        android:color="#29FFFFFF" />
+</shape>

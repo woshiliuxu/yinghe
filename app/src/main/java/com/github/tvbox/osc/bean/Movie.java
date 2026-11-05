@@ -53,6 +53,8 @@ public class Movie implements Serializable {
         public String state;
         @XStreamAlias("note")//描述集数或者影片信息<![CDATA[共40集]]>
         public String note;
+        @XStreamAlias("rate")//评分：只有豆瓣推荐会填，站点数据一般是空的
+        public String rate;
         @XStreamAlias("actor")//演员<![CDATA[张国立,蒋欣,高鑫,曹艳艳,王维维,韩丹彤,孟秀,王新]]>
         public String actor;
         @XStreamAlias("director")//导演<![CDATA[陈国星]]>

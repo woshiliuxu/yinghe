@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 海报左上角年份/画质角标 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="6mm" />
+    <solid android:color="#99000000" />
+</shape>

@@ -1,33 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 线路 / 集数分组共用的胶囊条目（方案 B：线路行 40 高、分组行 32 高，共用一套样式）。
+     「当前线路」不靠 state_selected 表达 —— TvRecyclerView 会拿 selected 标记焦点位置，
+     焦点一走它就把状态清掉，白底跟着消失、只剩黑字（2026-11-05 用户报的"字体变黑"）。
+     所以背景由适配器按数据 setBackgroundResource(on / off) 切换，这里只给 off 当默认。
+     条目间距也不写在这里：由 DetailActivity 的 ItemDecoration 给（线路 14 / 分组 12）。 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:layout_marginRight="@dimen/vs_10"
-    android:background="@drawable/shape_source_flag_focus"
+    android:background="@drawable/shape_flag_pill_off"
     android:clickable="true"
     android:focusable="true"
-    android:orientation="vertical"
-    android:paddingLeft="@dimen/vs_10"
-    android:paddingTop="@dimen/vs_5"
-    android:paddingRight="@dimen/vs_10"
-    android:paddingBottom="@dimen/vs_1">
+    android:gravity="center"
+    android:orientation="vertical">
 
+    <!-- duplicateParentState：文字色的 ColorStateList 靠 state_focused 切换，
+         但焦点在根 LinearLayout 上，TextView 不继承就永远拿不到 focused 状态
+         —— 结果就是"焦点在这一颗胶囊上，字却还是灰的"。 -->
     <TextView
         android:id="@+id/tvSeriesFlag"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/vs_30"
+        android:layout_height="wrap_content"
+        android:duplicateParentState="true"
         android:ellipsize="end"
         android:gravity="center"
+        android:includeFontPadding="false"
+        android:paddingStart="@dimen/vs_18"
+        android:paddingLeft="@dimen/vs_18"
+        android:paddingEnd="@dimen/vs_18"
+        android:paddingRight="@dimen/vs_18"
         android:singleLine="true"
         android:text="SeriesFlag"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/ts_20" />
-
-    <View
-        android:id="@+id/tvSeriesFlagSelect"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/vs_4"
-        android:layout_marginLeft="@dimen/vs_5"
-        android:layout_marginRight="@dimen/vs_5"
-        android:background="@drawable/shape_source_flag_line" />
+        android:textColor="@color/ui_text_2"
+        android:textSize="@dimen/ts_15" />
 </LinearLayout>

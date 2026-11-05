@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 详情页封面：圆角 12 + 细描边，压在模糊剧照上做"实体"区隔 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="@dimen/vs_12" />
+    <stroke
+        android:width="1mm"
+        android:color="#1FFFFFFF" />
+</shape>

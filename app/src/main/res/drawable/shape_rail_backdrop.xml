@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 左栏展开时的托底玻璃面。
+     折叠态整块透明（图标直接浮在海报上，最干净）；
+     一聚焦就随宽度一起拉开，文字落到这块面上，否则白字压在亮海报上会糊。
+     跟 shape_detail_panel 同一套语言：上亮下暗的极淡白 + 1mm 描边，不做纯色块。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="@dimen/vs_22" />
+    <gradient
+        android:angle="270"
+        android:startColor="#26FFFFFF"
+        android:endColor="#12FFFFFF" />
+    <stroke
+        android:width="1mm"
+        android:color="#33FFFFFF" />
+</shape>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 方案 B 的横向压暗层：盖在主剧照左侧 640 宽范围内，
+     左边 80% 黑 → 中间 30% → 右边完全透明。
+     作用是给标题和简介兜一个暗底——源站的剧照经常是亮调的，
+     没有这层的话白字会糊在天空/白墙上。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="0"
+        android:centerColor="#4D0B0C0F"
+        android:endColor="#000B0C0F"
+        android:startColor="#CC0B0C0F" />
+</shape>

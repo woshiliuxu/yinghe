@@ -24,7 +24,7 @@
             android:shadowRadius="5"
             android:singleLine="true"
             android:text="11111111"
-            android:textColor="@color/color_FFFFFF"
+            android:textColor="@color/dialog_text_main"
             android:textSize="@dimen/ts_26"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"

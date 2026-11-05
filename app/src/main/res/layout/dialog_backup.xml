@@ -24,7 +24,7 @@
             android:shadowRadius="5"
             android:singleLine="true"
             android:text="@string/dia_bkres"
-            android:textColor="@color/color_FFFFFF"
+            android:textColor="@color/dialog_text_main"
             android:textSize="@dimen/ts_26"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -54,7 +54,7 @@
                 android:gravity="center"
                 android:padding="@dimen/vs_10"
                 android:text="立即备份"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/dialog_row_text"
                 android:textSize="@dimen/ts_22" />
 
             <TextView
@@ -70,7 +70,7 @@
                 android:gravity="center"
                 android:padding="@dimen/vs_10"
                 android:text="存储权限"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/dialog_row_text"
                 android:textSize="@dimen/ts_22" />
         </LinearLayout>
 
@@ -87,7 +87,7 @@
             android:shadowRadius="5"
             android:singleLine="true"
             android:text="@string/dia_bkpkg"
-            android:textColor="@color/color_FFFFFF"
+            android:textColor="@color/dialog_text_main"
             android:textSize="@dimen/ts_26"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"

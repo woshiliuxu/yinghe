@@ -139,7 +139,8 @@ public class ApiConfig {
 
     public void loadConfig(boolean useCache, LoadConfigCallback callback, Activity activity) {
         // Embedded Source : Update in Strings.xml if required
-        String apiUrl = Hawk.get(HawkConfig.API_URL, HomeActivity.getRes().getString(R.string.app_source));
+        // 不能走 HomeActivity.getRes()：启动页阶段 HomeActivity 还没创建，静态 res 是 null
+        String apiUrl = Hawk.get(HawkConfig.API_URL, App.getInstance().getString(R.string.app_source));
         if (apiUrl.isEmpty()) {
             callback.error("源地址为空");
             return;

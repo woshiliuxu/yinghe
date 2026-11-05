@@ -11,12 +11,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Rational;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,10 +28,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentContainerView;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.blankj.utilcode.util.ServiceUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -50,10 +54,12 @@ import com.github.tvbox.osc.ui.adapter.SeriesAdapter;
 import com.github.tvbox.osc.ui.adapter.SeriesFlagAdapter;
 import com.github.tvbox.osc.ui.adapter.SeriesGroupAdapter;
 import com.github.tvbox.osc.ui.dialog.DescDialog;
+import com.github.tvbox.osc.ui.dialog.DetailMoreDialog;
 import com.github.tvbox.osc.ui.dialog.PushDialog;
 import com.github.tvbox.osc.ui.dialog.QuickSearchDialog;
 import com.github.tvbox.osc.ui.fragment.PlayFragment;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
+import com.github.tvbox.osc.util.BackdropLoader;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.ImgUtil;
 import com.github.tvbox.osc.util.SearchHelper;
@@ -96,27 +102,31 @@ import java.util.regex.Pattern;
  * @description:
  */
 public class DetailActivity extends BaseActivity {
-    private LinearLayout llLayout;
+    /** LoadSir 的根容器。布局里是 FrameLayout（详情页整页是叠层，不需要 LinearLayout） */
+    private FrameLayout llLayout;
     private FragmentContainerView llPlayerFragmentContainer;
     private View llPlayerFragmentContainerBlock;
     private View llPlayerPlace;
+    /** 方案 B 的左信息区（片名 / 元信息 / 主演 / 简介），开窗口预览时整块让给播放器 */
+    private View llInfo;
+    /** 播放 / 收藏 / 换源 / 更多 这一行，左缘永远跟信息区对齐（开预览时一起右移） */
+    private View llActions;
     private PlayFragment playFragment = null;
     private ImageView ivThumb;
+    private ImageView bgBlur;
     private TextView tvName;
-    private TextView tvYear;
+    private TextView tvMeta;
     private TextView tvSite;
-    private TextView tvArea;
-    private TextView tvLang;
-    private TextView tvType;
-    private TextView tvActor;
-    private TextView tvDirector;
+    /** 评分胶囊：没有豆瓣评分时整颗不显示，不做「暂无评分」的空壳 */
+    private TextView tvRate;
+    private TextView tvCast;
+    /** 元信息主串（年份/地区/语言/类型），fillRateBlock 在它后面追加集数，避免重复拼 */
+    private String baseMeta = "";
     private TextView tvDes;
-    private TextView tvDesc;
     private TextView tvPlay;
     private TextView tvSort;
-    private TextView tvPush;
-    private TextView tvQuickSearch;
-    private TextView tvCollect;
+    private ImageView tvMore;
+    private ImageView tvCollect;
     private TvRecyclerView mGridViewFlag;
     private TvRecyclerView mGridView;
     private TvRecyclerView mSeriesGroupView;
@@ -143,6 +153,8 @@ public class DetailActivity extends BaseActivity {
     private List<List<VodInfo.VodSeries>> uu;
     private int GroupCount;
     private int GroupIndex = 0;
+    /** 演员/导演这类长文本不进主界面，拼在「完整简介」弹窗正文前面 */
+    private String metaExtra = "";
 
     // preview : true 开启 false 关闭
     VodInfo previewVodInfo = null;
@@ -236,43 +248,52 @@ public class DetailActivity extends BaseActivity {
         llPlayerFragmentContainer = findViewById(R.id.previewPlayer);
         llPlayerFragmentContainerBlock = findViewById(R.id.previewPlayerBlock);
         ivThumb = findViewById(R.id.ivThumb);
+        bgBlur = findViewById(R.id.bgBlur);
+        // 方案 B 没有海报位：开「窗口预览」时把左上整块信息区藏掉，
+        // 520x292（16:9）的播放器正好落在同一位置（见布局注释）
+        llInfo = findViewById(R.id.llInfo);
+        llActions = findViewById(R.id.llActions);
         llPlayerPlace.setVisibility(showPreview ? View.VISIBLE : View.GONE);
-        ivThumb.setVisibility(!showPreview ? View.VISIBLE : View.GONE);
+        // 第一行两套尺寸：关预览 = 封面 224x336 + 信息区 x308；
+        // 开预览 = 视频窗 597x336（C 方案）+ 信息区 x681。见 applyPreviewLayout()
+        applyPreviewLayout(showPreview);
         tvName = findViewById(R.id.tvName);
-        tvYear = findViewById(R.id.tvYear);
+        tvMeta = findViewById(R.id.tvMeta);
         tvSite = findViewById(R.id.tvSite);
-        tvArea = findViewById(R.id.tvArea);
-        tvLang = findViewById(R.id.tvLang);
-        tvType = findViewById(R.id.tvType);
-        tvActor = findViewById(R.id.tvActor);
-        tvDirector = findViewById(R.id.tvDirector);
+        tvRate = findViewById(R.id.tvRate);
+        tvCast = findViewById(R.id.tvCast);
         tvDes = findViewById(R.id.tvDes);
-        tvDesc = findViewById(R.id.tvDesc);
         tvPlay = findViewById(R.id.tvPlay);
         tvSort = findViewById(R.id.tvSort);
-        tvPush = findViewById(R.id.tvPush);
+        tvMore = findViewById(R.id.tvMore);
         tvCollect = findViewById(R.id.tvCollect);
-        tvQuickSearch = findViewById(R.id.tvQuickSearch);
         tvPlayUrl = findViewById(R.id.tvPlayUrl);
         mEmptyPlayList = findViewById(R.id.mEmptyPlaylist);
         mGridView = findViewById(R.id.mGridView);
         mGridView.setHasFixedSize(false);
-        mGridViewLayoutMgr = new V7GridLayoutManager(this.mContext, 6);
+        // 固定 12 列。方案 D 第二行通栏可用宽 1168，1168 = 12×86 + 11×12，格子 86x58；
+        // 不按字宽动态算列数——动态列数会让「第 6 集」和「第 7 集」落在不同宽度的格子里。
+        mGridViewLayoutMgr = new V7GridLayoutManager(this.mContext, 12);
         mGridView.setLayoutManager(mGridViewLayoutMgr);
+        applyGridSpacing(12);
 //        mGridView.setLayoutManager(new V7GridLayoutManager(this.mContext, isBaseOnWidth() ? 6 : 7));
         seriesAdapter = new SeriesAdapter();
         mGridView.setAdapter(seriesAdapter);
         mGridViewFlag = findViewById(R.id.mGridViewFlag);
         mGridViewFlag.setHasFixedSize(true);
         mGridViewFlag.setLayoutManager(new V7LinearLayoutManager(this.mContext, 0, false));
+        applyPillSpacing(mGridViewFlag, R.dimen.vs_14);
         seriesFlagAdapter = new SeriesFlagAdapter();
         mGridViewFlag.setAdapter(seriesFlagAdapter);
         if (showPreview) {
             playFragment = new PlayFragment();
             getSupportFragmentManager().beginTransaction().add(R.id.previewPlayer, playFragment).commit();
             getSupportFragmentManager().beginTransaction().show(playFragment).commitAllowingStateLoss();
-            tvPlay.setText(getString(R.string.det_expand));
-            tvPlay.setVisibility(View.GONE);
+            // 原版这里把播放键整个藏掉，是因为老布局里播放键就压在海报位置上。
+            // 现在窗口预览只占海报那块 372x209，下面的按钮行是独立的，
+            // 藏掉之后左下角只剩三个圆图标、没有主操作，所以改成保留、只换文案。
+            tvPlay.setVisibility(View.VISIBLE);
+            tvPlay.requestFocus();
         } else {
             tvPlay.setVisibility(View.VISIBLE);
             tvPlay.requestFocus();
@@ -281,6 +302,7 @@ public class DetailActivity extends BaseActivity {
         mSeriesGroupView = findViewById(R.id.mSeriesGroupView);
         mSeriesGroupView.setHasFixedSize(true);
         mSeriesGroupView.setLayoutManager(new V7LinearLayoutManager(this.mContext, 0, false));
+        applyPillSpacing(mSeriesGroupView, R.dimen.vs_12);
         seriesGroupAdapter = new SeriesGroupAdapter();
         mSeriesGroupView.setAdapter(seriesGroupAdapter);
 
@@ -304,11 +326,27 @@ public class DetailActivity extends BaseActivity {
             }
         });
 
-        tvPush.setOnClickListener(new View.OnClickListener() {
+        // 「更多」：原来并排的六个等宽按钮里，复制播放地址 / 推送 / 完整简介收进这里
+        tvMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PushDialog pushDialog = new PushDialog(mContext);
-                pushDialog.show();
+                DetailMoreDialog moreDialog = new DetailMoreDialog(mContext, new DetailMoreDialog.OnActionListener() {
+                    @Override
+                    public void onCopyUrl() {
+                        copyPlayUrl();
+                    }
+
+                    @Override
+                    public void onPush() {
+                        new PushDialog(mContext).show();
+                    }
+
+                    @Override
+                    public void onDesc() {
+                        showFullDesc();
+                    }
+                });
+                moreDialog.show();
             }
         });
         tvPlay.setOnClickListener(new View.OnClickListener() {
@@ -337,7 +375,8 @@ public class DetailActivity extends BaseActivity {
                 toggleFullPreview();
             }
         });
-        tvQuickSearch.setOnClickListener(new View.OnClickListener() {
+        // 「换源」：和原版的「快速搜索」是同一件事——在所有站点的结果里换一条线路
+        tvPlayUrl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startQuickSearch();
@@ -371,62 +410,21 @@ public class DetailActivity extends BaseActivity {
         tvCollect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text = tvCollect.getText().toString();
-                if (getString(R.string.det_fav_unstar).equals(text)) {
+                // 收藏是图标按钮，状态靠"实心 / 描边"两种心形区分，不再靠文字
+                boolean collected = Boolean.TRUE.equals(v.getTag());
+                if (!collected) {
                     RoomDataManger.insertVodCollect(sourceKey, vodInfo);
                     Toast.makeText(DetailActivity.this, getString(R.string.det_fav_add), Toast.LENGTH_SHORT).show();
-                    tvCollect.setText(getString(R.string.det_fav_star));
+                    setCollected(true);
                 } else {
                     RoomDataManger.deleteVodCollect(sourceKey, vodInfo);
                     Toast.makeText(DetailActivity.this, getString(R.string.det_fav_del), Toast.LENGTH_SHORT).show();
-                    tvCollect.setText(getString(R.string.det_fav_unstar));
+                    setCollected(false);
                 }
             }
         });
-        tvDesc.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        FastClickCheckUtil.check(v);
-                        DescDialog dialog = new DescDialog(mContext);
-                        //  dialog.setTip("内容简介");
-                        dialog.setDescribe(removeHtmlTag(mVideo.des));
-                        dialog.show();
-                    }
-                });
-            }
-        });
-
-        tvDesc.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        FastClickCheckUtil.check(v);
-                        ClipboardManager clipprofile = (ClipboardManager) DetailActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
-                        String cpContent = removeHtmlTag(mVideo.des);
-                        ClipData clipData = ClipData.newPlainText(null, cpContent);
-                        clipprofile.setPrimaryClip(clipData);
-                        Toast.makeText(DetailActivity.this, "已复制：" + cpContent, Toast.LENGTH_SHORT).show();
-                    }
-                });
-                return true;
-            }
-        });
-
-        tvPlayUrl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //获取剪切板管理器
-                ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                //设置内容到剪切板
-                cm.setPrimaryClip(ClipData.newPlainText(null, vodInfo.seriesMap.get(vodInfo.playFlag).get(vodInfo.getplayIndex()).url));
-                Toast.makeText(DetailActivity.this, getString(R.string.det_url), Toast.LENGTH_SHORT).show();
-            }
-        });
+        // 注意：动作行的焦点表现**只用背景**（白底 + 深色描边，见 bg_detail_play / bg_detail_icon），
+        // 不要加 scale 放大 —— 父容器是 0 高基线的横向 LinearLayout，放大后边缘会被裁，很难看。
         mGridView.setOnItemListener(new TvRecyclerView.OnItemListener() {
             @Override
             public void onItemPreSelected(TvRecyclerView parent, View itemView, int position) {
@@ -626,24 +624,6 @@ public class DetailActivity extends BaseActivity {
                 }
             }
 
-            // Dynamic series list width
-            Paint pFont = new Paint();
-            //List<VodInfo.VodSeries> list = vodInfo.seriesMap.get(vodInfo.playFlag);
-            int listSize = list.size();
-            int w = 1;
-            for (int i = 0; i < listSize; ++i) {
-                String name = list.get(i).name;
-                if (w < (int) pFont.measureText(name)) {
-                    w = (int) pFont.measureText(name);
-                }
-            }
-            w += 32;
-            int screenWidth = getWindowManager().getDefaultDisplay().getWidth() / 3;
-            int offset = screenWidth / w;
-            if (offset <= 2) offset = 2;
-            if (offset > 6) offset = 6;
-            mGridViewLayoutMgr.setSpanCount(offset);
-
             List<VodSeriesGroup> seriesGroupList = getSeriesGroupList();
             seriesGroupList.get(vodInfo.playGroup).selected = true;
             seriesGroupAdapter.setNewData(seriesGroupList);
@@ -678,8 +658,9 @@ public class DetailActivity extends BaseActivity {
                 GroupIndex = 0;
             }
             int Groups = (int) Math.ceil(size / (GroupCount + 0.0f));
+            // 只有一组时（≤20 集）分组行整行不显示，剧集网格直接上移 54
+            mSeriesGroupView.setVisibility(Groups > 1 ? View.VISIBLE : View.GONE);
             for (int i = 0; i < Groups; i++) {
-                mSeriesGroupView.setVisibility(View.VISIBLE);
                 int s = (i * GroupCount) + 1;
                 int e = (i + 1) * GroupCount;
                 int name_s = s;
@@ -748,24 +729,20 @@ public class DetailActivity extends BaseActivity {
                     sourceKey = mVideo.sourceKey;
 
                     tvName.setText(mVideo.name);
-                    setTextShow(tvSite, getString(R.string.det_source), ApiConfig.get().getSource(firstsourceKey).getName());
-                    setTextShow(tvYear, getString(R.string.det_year), mVideo.year == 0 ? "" : String.valueOf(mVideo.year));
-                    setTextShow(tvArea, getString(R.string.det_area), mVideo.area);
-                    setTextShow(tvLang, getString(R.string.det_lang), mVideo.lang);
-                    if (!firstsourceKey.equals(sourceKey)) {
-                        setTextShow(tvType, getString(R.string.det_type), "[" + ApiConfig.get().getSource(sourceKey).getName() + "] 解析");
-                    } else {
-                        setTextShow(tvType, getString(R.string.det_type), mVideo.type);
-                    }
-                    setTextShow(tvActor, getString(R.string.det_actor), mVideo.actor);
-                    setTextShow(tvDirector, getString(R.string.det_dir), mVideo.director);
-                    setTextShow(tvDes, getString(R.string.det_des), removeHtmlTag(mVideo.des));
+                    BackdropLoader.load(DetailActivity.this, bgBlur, mVideo.pic);
+                    // 站点降级成片名旁边一个不可聚焦的小胶囊，不再单独占一行
+                    tvSite.setText(cleanSourceName(ApiConfig.get().getSource(firstsourceKey).getName()));
+                    bindMetaLine();
+                    fillRateBlock();
+                    setTextShow(tvDes, "", removeHtmlTag(mVideo.des));
                     if (!TextUtils.isEmpty(mVideo.pic)) {
                         // takagen99 : Use Glide instead : Rounding Radius is in pixel
                         ImgUtil.load(mVideo.pic, ivThumb, 14);
                     } else {
                         ivThumb.setImageResource(R.drawable.img_loading_placeholder);
                     }
+                    // 详情到手、封面也塞进去了，这时才把封面 / 视频窗放出来
+                    setFirstRowLoaded(true);
 
                     if (vodInfo.seriesMap != null && vodInfo.seriesMap.size() > 0) {
                         mGridViewFlag.setVisibility(View.VISIBLE);
@@ -837,10 +814,233 @@ public class DetailActivity extends BaseActivity {
         });
     }
 
+
+    /**
+     * 切线路 / 换源回到加载态时，第一行重新藏起来，避免"旧封面 + 新加载动画"同屏。
+     */
+    @Override
+    protected void showLoading() {
+        super.showLoading();
+        setFirstRowLoaded(false);
+    }
+
+    /**
+     * 胶囊行（线路 / 集数分组）的条目间距。
+     * 间距不再写在 item_series_flag 的 marginEnd 上——焦点动画会给条目换 LayoutParams，
+     * margin 有被吞掉的风险（真机上就是"气泡贴在一起"）；ItemDecoration 由列表自己出，
+     * 跟条目怎么复用、怎么动画都无关。
+     */
+    private void applyPillSpacing(TvRecyclerView view, int gapRes) {
+        final int gap = getResources().getDimensionPixelSize(gapRes);
+        view.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View itemView,
+                                       @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                outRect.right = gap;
+            }
+        });
+    }
+
+    /**
+     * 第一行（封面 / 视频窗）是否已经有内容可显示。
+     * 加载中这两个 View 挂在根层，LoadSir 换不掉，不藏的话加载动画旁边会挂着一块黑窗
+     * 或者一张空占位封面 —— 用户原话"点进来先看到一个窗口，很怪"。
+     * 只有真正拿到详情、封面图也塞进去了才置 true（见 initViewModel 里的 setFirstRowLoaded）。
+     */
+    private boolean detailLoaded = false;
+
+    /**
+     * 窗口预览开 / 关，第一行换两套尺寸（2026-11-04 用户拍板 C 方案）：
+     *   关：封面 224x336 @ x56，信息区 x308 宽 916
+     *   开：视频窗 597x336 @ x56（16:9，与封面等高），封面隐藏，信息区 x681 宽 543
+     * 数值都是设计稿像素，要改请连着 vs_ 一起改，这里不写比例。
+     */
+    private void applyPreviewLayout(boolean on) {
+        final int left = getResources().getDimensionPixelSize(on ? R.dimen.vs_681 : R.dimen.vs_308);
+        final int width = getResources().getDimensionPixelSize(on ? R.dimen.vs_543 : R.dimen.vs_916);
+
+        ViewGroup.MarginLayoutParams infoLp = (ViewGroup.MarginLayoutParams) llInfo.getLayoutParams();
+        infoLp.width = width;
+        infoLp.setMarginStart(left);
+        infoLp.leftMargin = left;
+        llInfo.setLayoutParams(infoLp);
+
+        // 动作行跟着信息区走：它压在信息区底部，左缘必须和信息区同一条线
+        ViewGroup.MarginLayoutParams actLp = (ViewGroup.MarginLayoutParams) llActions.getLayoutParams();
+        actLp.setMarginStart(left);
+        actLp.leftMargin = left;
+        llActions.setLayoutParams(actLp);
+
+        // 封面与视频窗是同一个位置的两副面孔，同时只出现一个；没数据时两个都不出现
+        setFirstRowVisible(on);
+    }
+
+    /** 加载完成后调用，把封面 / 视频窗放出来 */
+    private void setFirstRowLoaded(boolean loaded) {
+        detailLoaded = loaded;
+        setFirstRowVisible(showPreview);
+    }
+
+    private void setFirstRowVisible(boolean previewOn) {
+        boolean showThumb = detailLoaded && !previewOn;
+        boolean showVideo = detailLoaded && previewOn;
+        ivThumb.setVisibility(showThumb ? View.VISIBLE : View.GONE);
+        llPlayerFragmentContainer.setVisibility(showVideo ? View.VISIBLE : View.GONE);
+        llPlayerFragmentContainerBlock.setVisibility(showVideo ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * 剧集网格的行列间距，用 ItemDecoration 给，不用 TvRecyclerView 的 spacingWithMargins。
+     * spacingWithMargins 是往 item 两边各加 margin，12 列会直接把右边那列顶出 1168 的可视区；
+     * decoration 则是在测量 span 之前把宽度扣掉，列宽自然等于 (1168 - 12×12) / 12。
+     * 行距比列距小一档（8 对 12）。
+     *
+     * 最后一行不再留行距：带集数分组时网格只剩 178，
+     * 3 行 × 54 + 2 × 8 = 178 正好塞满；最后一行也留 8 的话第三行会被挤出去 8px。
+     */
+    private void applyGridSpacing(int spanCount) {
+        final int gap = getResources().getDimensionPixelSize(R.dimen.vs_12);
+        final int rowGap = getResources().getDimensionPixelSize(R.dimen.vs_8);
+        final int half = gap / 2;
+        final int span = Math.max(1, spanCount);
+        mGridView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view,
+                                       @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                outRect.left = half;
+                outRect.right = half;
+                outRect.top = 0;
+                int pos = parent.getChildAdapterPosition(view);
+                int count = state.getItemCount();
+                outRect.bottom = (pos >= 0 && count > 0 && pos >= count - span) ? 0 : rowGap;
+            }
+        });
+    }
+
     private void updateSortButtonText() {
         if (vodInfo != null && vodInfo.seriesMap != null && vodInfo.seriesMap.size() > 0) {
             tvSort.setText(vodInfo.reverseSort ? R.string.det_sort_normal : R.string.det_sort);
         }
+    }
+
+    /**
+     * 站点名在配置里普遍长成「🍋┃柠檬┃秒播」——emoji 加全角分隔符。
+     * 详情页这个位置只有 144 宽，原样塞进去会被截成「🍋┃柠…」，
+     * 所以取「┃」分段里最长的一段纯中文/字母数字，得到「柠檬」。
+     */
+    private String cleanSourceName(String name) {
+        if (TextUtils.isEmpty(name)) return "";
+        String best = "";
+        for (String part : name.split("[┃|｜]")) {
+            String t = part.replaceAll("[^\\u4e00-\\u9fa5A-Za-z0-9\\s]", "").trim();
+            if (t.length() > best.length()) best = t;
+        }
+        if (best.isEmpty()) {
+            best = name.replaceAll("[^\\u4e00-\\u9fa5A-Za-z0-9\\s]", "").trim();
+        }
+        return best;
+    }
+
+    /**
+     * 元信息合成一行：2023 · 内地 · 国语 · 剧情 / 悬疑。
+     * 原版是「年份: / 地区: / 语言: / 类型:」四行带标签的灰字，占 4 行高度却只有 4 个短值，
+     * 详情页右上角整个被这些标签撑满。合成一行后腾出的高度全给剧集网格。
+     */
+    private void bindMetaLine() {
+        if (mVideo == null) return;
+        List<String> parts = new ArrayList<>();
+        if (mVideo.year > 0) parts.add(String.valueOf(mVideo.year));
+        if (!TextUtils.isEmpty(mVideo.area)) parts.add(mVideo.area.trim());
+        if (!TextUtils.isEmpty(mVideo.lang)) parts.add(mVideo.lang.trim());
+        if (!firstsourceKey.equals(sourceKey)) {
+            parts.add("[" + ApiConfig.get().getSource(sourceKey).getName() + "] 解析");
+        } else if (!TextUtils.isEmpty(mVideo.type)) {
+            parts.add(mVideo.type.trim());
+        }
+        baseMeta = TextUtils.join(" · ", parts);
+        tvMeta.setText(baseMeta);
+
+        // 导演 / 主演：方案 B 在片名下面单起一行，两行以内截断。
+        // 完整信息（含未截断的演员表）仍然挂在「完整简介」弹窗正文前面（metaExtra）
+        StringBuilder cast = new StringBuilder();
+        if (!TextUtils.isEmpty(mVideo.director)) cast.append("导演 ").append(mVideo.director.trim());
+        if (!TextUtils.isEmpty(mVideo.actor)) {
+            if (cast.length() > 0) cast.append("   ·   ");
+            cast.append("主演 ").append(mVideo.actor.trim());
+        }
+        if (cast.length() > 0) {
+            tvCast.setText(cast.toString());
+            tvCast.setVisibility(View.VISIBLE);
+        } else {
+            tvCast.setVisibility(View.GONE);
+        }
+
+        // 演员和导演实在太长，一屏塞不下又不好删——挂进完整简介的弹窗里
+        StringBuilder sb = new StringBuilder();
+        if (!TextUtils.isEmpty(mVideo.actor)) sb.append("主演：").append(mVideo.actor.trim()).append("\n");
+        if (!TextUtils.isEmpty(mVideo.director)) sb.append("导演：").append(mVideo.director.trim()).append("\n\n");
+        metaExtra = sb.toString();
+    }
+
+    /**
+     * 评分胶囊 + 集数尾巴。
+     * 详情接口大多不返回豆瓣评分：有评分就显示一颗「8.6」胶囊，没有就整颗藏掉，
+     * 集数（「全 24 集」）和更新状态（「更新至 12 集」）接在元信息行末尾。
+     * 方案 C 那套「大字评分 + 侧栏」在方案 B 里没有横向位置了，全部压进一行。
+     */
+    private void fillRateBlock() {
+        int epCount = 0;
+        try {
+            if (vodInfo != null && vodInfo.seriesMap != null && !vodInfo.seriesMap.isEmpty()) {
+                epCount = vodInfo.seriesMap.get(vodInfo.seriesMap.keySet().toArray()[0]).size();
+            }
+        } catch (Exception ignored) {
+        }
+        String note = mVideo == null ? null : mVideo.note;
+        String rate = mVideo == null ? null : mVideo.rate;
+        boolean hasRate = !TextUtils.isEmpty(rate) && !"0.0".equals(rate.trim());
+
+        tvRate.setText(hasRate ? rate.trim() + " 豆瓣" : "");
+        tvRate.setVisibility(hasRate ? View.VISIBLE : View.GONE);
+
+        StringBuilder tail = new StringBuilder();
+        if (epCount > 1) {
+            tail.append("全 ").append(epCount).append(" 集");
+        } else if (epCount == 1) {
+            tail.append("单片");
+        }
+        if (!TextUtils.isEmpty(note)) {
+            if (tail.length() > 0) tail.append(" · ");
+            tail.append(note.trim());
+        }
+        if (tail.length() > 0) {
+            tvMeta.setText(TextUtils.isEmpty(baseMeta) ? tail : baseMeta + " · " + tail);
+        }
+    }
+
+    private void setCollected(boolean collected) {
+        if (tvCollect == null) return;
+        tvCollect.setTag(collected);
+        tvCollect.setImageResource(collected ? R.drawable.ic_d_heart_on : R.drawable.ic_d_heart);
+    }
+
+    private void copyPlayUrl() {
+        try {
+            ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            cm.setPrimaryClip(ClipData.newPlainText(null,
+                    vodInfo.seriesMap.get(vodInfo.playFlag).get(vodInfo.getplayIndex()).url));
+            Toast.makeText(DetailActivity.this, getString(R.string.det_url), Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(DetailActivity.this, "没有可复制的播放地址", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showFullDesc() {
+        if (mVideo == null) return;
+        String text = metaExtra + removeHtmlTag(mVideo.des);
+        DescDialog dialog = new DescDialog(mContext);
+        dialog.setDescribe(text);
+        dialog.show();
     }
 
     private String getHtml(String label, String content) {
@@ -850,7 +1050,7 @@ public class DetailActivity extends BaseActivity {
         if (label.length() > 0) {
             label = label + ": ";
         }
-        return label + "<font color=\"#FFFFFF\">" + content + "</font>";
+        return label + "<font color=\"#A9ACB4\">" + content + "</font>";
     }
 
     private void initData() {
@@ -869,12 +1069,7 @@ public class DetailActivity extends BaseActivity {
             showLoading();
             sourceViewModel.getDetail(sourceKey, vodId);
 
-            boolean isVodCollect = RoomDataManger.isVodCollect(sourceKey, vodId);
-            if (isVodCollect) {
-                tvCollect.setText(getString(R.string.det_fav_star));
-            } else {
-                tvCollect.setText(getString(R.string.det_fav_unstar));
-            }
+            setCollected(RoomDataManger.isVodCollect(sourceKey, vodId));
         }
     }
 
@@ -1304,10 +1499,9 @@ public class DetailActivity extends BaseActivity {
         // 全屏下禁用详情页几个按键的焦点 防止上键跑过来 : Disable buttons when full window
         tvPlay.setFocusable(!fullWindows);
         tvSort.setFocusable(!fullWindows);
-        tvPush.setFocusable(!fullWindows);
-        tvDesc.setFocusable(!fullWindows);
+        tvMore.setFocusable(!fullWindows);
         tvCollect.setFocusable(!fullWindows);
-        tvQuickSearch.setFocusable(!fullWindows);
+        tvPlayUrl.setFocusable(!fullWindows);
         toggleSubtitleTextSize();
 
         // Hide navbar only when video playing on full window, else show navbar

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 左栏分组卡：聚焦=暖白（当前操作位）；已激活（选中组，焦点在右侧时）=亮玻璃；常态=玻璃 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="#F4F1EA" />
+        </shape>
+    </item>
+    <item android:state_activated="true">
+        <shape>
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="#1AFFFFFF" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="#0DFFFFFF" />
+        </shape>
+    </item>
+</selector>

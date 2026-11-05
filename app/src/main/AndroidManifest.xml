@@ -46,9 +46,10 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".ui.activity.HomeActivity"
+            android:name=".ui.activity.SplashActivity"
             android:screenOrientation="sensorLandscape"
             android:exported="true"
+            android:theme="@style/SplashTheme"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -57,6 +58,11 @@
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.activity.HomeActivity"
+            android:screenOrientation="sensorLandscape"
+            android:exported="true"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation" />
         <activity
             android:name=".ui.activity.PlayActivity"
             android:screenOrientation="sensorLandscape"

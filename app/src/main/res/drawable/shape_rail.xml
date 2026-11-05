@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 左侧玻璃栏容器 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <corners android:radius="26mm" />
+            <gradient
+                android:angle="315"
+                android:startColor="@color/ui_glass_top"
+                android:endColor="@color/ui_glass_bottom" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="26mm" />
+            <solid android:color="@android:color/transparent" />
+            <stroke
+                android:width="1mm"
+                android:color="@color/ui_glass_border" />
+        </shape>
+    </item>
+</layer-list>

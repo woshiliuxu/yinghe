@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 线路 / 分组胶囊 · **当前选中**那一条（暖白实底 + 深色字）。
+     为什么不用 state_selected 表达「当前线路」：
+     owen 的 TvRecyclerView 把 item 的 selected 状态当成「焦点在哪一条」在用，
+     焦点一移走它就把 selected 清掉 —— 于是「当前线路」的白底消失、只剩黑字，
+     在黑背景上等于看不见（2026-11-05 用户报的"字体变黑"就是这个）。
+     现在选中与否由适配器按数据 setBackgroundResource 决定，跟焦点彻底解耦；
+     焦点只在下面这个 focused 分支里表达。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="@dimen/vs_20" />
+            <solid android:color="#FFFFFF" />
+            <stroke
+                android:width="3mm"
+                android:color="#590B0C0F" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="@dimen/vs_20" />
+            <solid android:color="#F4F1EA" />
+        </shape>
+    </item>
+</selector>

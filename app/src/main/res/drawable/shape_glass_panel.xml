@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 玻璃面板（大件：侧栏 / 对话框 / 卡片容器）
+     Android 没有 backdrop-filter，这里用「12%→3% 白色渐变 + 1px 白色描边」
+     模拟磨砂玻璃的光学特征；真正让它看起来像玻璃的是背后的模糊海报底图。 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <corners android:radius="18mm" />
+            <gradient
+                android:angle="315"
+                android:startColor="@color/ui_glass_top"
+                android:endColor="@color/ui_glass_bottom" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="18mm" />
+            <solid android:color="@android:color/transparent" />
+            <stroke
+                android:width="1mm"
+                android:color="@color/ui_glass_border" />
+        </shape>
+    </item>
+</layer-list>

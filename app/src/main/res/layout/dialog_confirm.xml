@@ -29,7 +29,7 @@
             android:shadowDy="0"
             android:shadowRadius="5"
             android:singleLine="true"
-            android:textColor="@color/color_FFFFFF"
+            android:textColor="@color/dialog_text_main"
             android:textSize="@dimen/ts_26"
             android:textStyle="bold"
             android:text="@string/dia_confirm"
@@ -56,8 +56,8 @@
             android:shadowDy="0"
             android:shadowRadius="5"
             android:text="Yes"
-            android:textColor="@color/color_FFFFFF"
-            android:textColorHint="@color/color_FFFFFF_50"
+            android:textColor="@color/dialog_row_text"
+            android:textColorHint="@color/dialog_hint"
             android:textSize="@dimen/ts_20" />
 
         <TextView
@@ -77,8 +77,8 @@
             android:shadowDy="0"
             android:shadowRadius="5"
             android:text="No"
-            android:textColor="@color/color_FFFFFF"
-            android:textColorHint="@color/color_FFFFFF_50"
+            android:textColor="@color/dialog_row_text"
+            android:textColorHint="@color/dialog_hint"
             android:textSize="@dimen/ts_20" />
 
         </TableRow>

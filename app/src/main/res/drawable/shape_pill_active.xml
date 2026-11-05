@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 分类胶囊 · 当前分类：白色实底（配合深色文字）
+     纯白主色下这是唯一能一眼分出「当前在哪一栏」的做法 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="12mm" />
+    <solid android:color="#F4F1EA" />
+</shape>

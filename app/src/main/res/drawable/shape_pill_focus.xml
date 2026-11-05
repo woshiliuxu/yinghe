@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 分类胶囊 · 拿到焦点：白描边，不换底 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="12mm" />
+    <solid android:color="#24FFFFFF" />
+    <stroke
+        android:width="2mm"
+        android:color="@color/ui_accent" />
+</shape>

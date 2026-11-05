@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 左侧条目：焦点态整条变暖白胶囊，内容色由 @color/rail_content 反色成深色；
+     selected 给一层淡白，表示当前所在页。折叠/展开只改条目宽度，背景跟着走。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="22mm" />
+            <solid android:color="@color/color_theme" />
+        </shape>
+    </item>
+    <item android:state_selected="true">
+        <shape>
+            <corners android:radius="22mm" />
+            <solid android:color="#1FFFFFFF" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="22mm" />
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+</selector>

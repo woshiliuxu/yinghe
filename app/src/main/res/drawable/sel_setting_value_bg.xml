@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 设置行的值胶囊：常态玻璃描边，行聚焦时换深色半透明底（压在暖白行上）。
+     胶囊要拿到行的状态，布局里必须配 duplicateParentState -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="@dimen/vs_8" />
+            <solid android:color="#0F14161A" />
+            <stroke android:width="1mm" android:color="#1A14161A" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="@dimen/vs_8" />
+            <solid android:color="#0DFFFFFF" />
+            <stroke android:width="1mm" android:color="#12FFFFFF" />
+        </shape>
+    </item>
+</selector>

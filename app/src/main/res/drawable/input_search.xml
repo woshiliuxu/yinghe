@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 搜索框进入 -->
+<!-- 搜索输入框：玻璃输入框，焦点时描边加粗到 2mm -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--获得焦点-->
     <item android:state_focused="true">
         <shape>
             <corners android:radius="10mm" />
-            <solid android:color="?color_theme_40" />
-            <stroke android:width="2mm" android:color="@android:color/white" />
+            <solid android:color="#24FFFFFF" />
+            <stroke
+                android:width="2mm"
+                android:color="@color/ui_accent" />
         </shape>
     </item>
-    <!--默认-->
-    <item android:state_focused="false">
+    <item>
         <shape>
             <corners android:radius="10mm" />
+            <solid android:color="#12FFFFFF" />
             <stroke
                 android:width="@dimen/vs_2"
-                android:color="#70FFFFFF" />
+                android:color="@color/ui_glass_border" />
         </shape>
     </item>
 </selector>

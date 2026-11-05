@@ -1,137 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 分类略缩图 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+<!-- 海报卡（2026 重设计 · 方案 A 内容全屏）
+     尺寸不再写死：宽由 GridLayoutManager 分配的列宽决定，高由 PosterCardLayout 按 2:3 算。
+     4mm 内边距留给焦点描边，描边画在 padding 区域里，所以焦点出现时卡片不会位移、也不会撑开同行高度。
+     首页走「纯海报」模式（GridAdapter.plainPoster=true）：常态不显示任何文字，
+     焦点那一张才浮出片名与备注，其余 13 张是干净的海报。 -->
+<com.github.tvbox.osc.ui.tv.widget.PosterCardLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/shape_thumb_radius"
+    android:background="@drawable/sel_poster_frame"
     android:focusable="true"
-    android:padding="@dimen/vs_1">
+    android:focusableInTouchMode="true"
+    android:padding="@dimen/vs_4">
 
     <FrameLayout
-        android:layout_width="@dimen/vs_214"
-        android:layout_height="@dimen/vs_280">
+        android:id="@+id/cardFrame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/shape_poster_inner">
 
         <ImageView
             android:id="@+id/ivThumb"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="@dimen/vs_1"
-            android:scaleType="fitXY" />
+            android:scaleType="centerCrop" />
+
+        <View
+            android:id="@+id/scrim"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/vs_100"
+            android:layout_gravity="bottom"
+            android:background="@drawable/scrim_poster_bottom"
+            android:visibility="gone" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/vs_5"
-            android:layout_marginTop="@dimen/vs_5"
-            android:layout_marginRight="@dimen/vs_5"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/tvYear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/vs_5"
-                android:layout_marginRight="@dimen/vs_5"
-                android:background="@drawable/shape_thumb_year"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:paddingLeft="@dimen/vs_5"
-                android:paddingRight="@dimen/vs_5"
-                android:singleLine="true"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/ts_20" />
-
-            <TextView
-                android:id="@+id/tvArea"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/vs_5"
-                android:layout_marginRight="@dimen/vs_5"
-                android:background="@drawable/shape_thumb_year"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:paddingLeft="@dimen/vs_5"
-                android:paddingRight="@dimen/vs_5"
-                android:singleLine="true"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/ts_20" />
-
-            <TextView
-                android:id="@+id/tvLang"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/vs_5"
-                android:layout_marginRight="@dimen/vs_5"
-                android:background="@drawable/shape_thumb_year"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:paddingLeft="@dimen/vs_5"
-                android:paddingRight="@dimen/vs_5"
-                android:singleLine="true"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/ts_20" />
-
-        </LinearLayout>
-
-
-        <LinearLayout
+            android:id="@+id/captionBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:orientation="vertical"
-            android:padding="@dimen/vs_1">
+            android:paddingLeft="@dimen/vs_12"
+            android:paddingRight="@dimen/vs_12"
+            android:paddingBottom="@dimen/vs_10"
+            android:visibility="gone">
 
-            <TextView
-                android:id="@+id/tvNote"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginLeft="@dimen/vs_5"
-                android:layout_marginRight="@dimen/vs_5"
-                android:layout_marginBottom="@dimen/vs_5"
-                android:background="@drawable/shape_thumb_note"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:paddingLeft="@dimen/vs_5"
-                android:paddingRight="@dimen/vs_5"
-                android:singleLine="true"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/ts_20" />
-
+            <!-- 片名允许两行：卡片只有 144 宽，24 号字一行只放得下 5 个字，
+                 《给阿嬷的情书》《万物生灵 第六季》这种一律被截成"给阿嬷的…"，
+                 看着像数据坏了。两行刚好够 10 个字，浮层高度仍压在底部遮罩之内。 -->
             <TextView
                 android:id="@+id/tvName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/shape_thumb_bottom_name"
-                android:ellipsize="marquee"
-                android:gravity="center"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:padding="@dimen/vs_5"
-                android:singleLine="true"
+                android:ellipsize="end"
+                android:maxLines="2"
                 android:text="Title"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/ts_22" />
+                android:textColor="@color/ui_text_1"
+                android:textSize="@dimen/ts_24" />
 
             <TextView
-                android:id="@+id/tvActor"
+                android:id="@+id/tvNote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/shape_thumb_bottom_name"
+                android:layout_marginTop="@dimen/vs_2"
                 android:ellipsize="end"
-                android:gravity="top"
-                android:padding="@dimen/vs_5"
                 android:singleLine="true"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/ts_16"
-                android:visibility="gone" />
+                android:textColor="@color/ui_text_2"
+                android:textSize="@dimen/ts_18" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvYear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/vs_8"
+            android:layout_marginLeft="@dimen/vs_8"
+            android:layout_marginTop="@dimen/vs_8"
+            android:background="@drawable/shape_badge"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:paddingLeft="@dimen/vs_6"
+            android:paddingRight="@dimen/vs_6"
+            android:singleLine="true"
+            android:textColor="@color/ui_text_2"
+            android:textSize="@dimen/ts_16"
+            android:visibility="gone" />
+
+        <!-- 豆瓣评分角标：只在豆瓣推荐页显示，右上角。
+             放右上不影响左上角的年份角标，两者也不会同时出现。 -->
+        <TextView
+            android:id="@+id/tvRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="@dimen/vs_8"
+            android:layout_marginEnd="@dimen/vs_8"
+            android:layout_marginRight="@dimen/vs_8"
+            android:background="@drawable/shape_rate_badge"
+            android:gravity="center"
+            android:minWidth="@dimen/vs_40"
+            android:paddingLeft="@dimen/vs_6"
+            android:paddingRight="@dimen/vs_6"
+            android:paddingTop="@dimen/vs_2"
+            android:paddingBottom="@dimen/vs_2"
+            android:singleLine="true"
+            android:textColor="@color/ui_text_1"
+            android:textSize="@dimen/ts_18"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvArea"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvLang"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvActor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
 
         <FrameLayout
             android:id="@+id/delFrameLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/shape_user_delete"
-            android:layout_gravity="center"
             android:visibility="gone">
 
             <ImageView
@@ -139,9 +136,8 @@
                 android:layout_width="@dimen/vs_80"
                 android:layout_height="@dimen/vs_80"
                 android:layout_gravity="center"
-                android:layout_marginBottom="@dimen/vs_20"
                 android:src="@drawable/icon_delete" />
         </FrameLayout>
 
     </FrameLayout>
-</FrameLayout>
+</com.github.tvbox.osc.ui.tv.widget.PosterCardLayout>

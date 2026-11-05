@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 菜单行文字：焦点时深色（因为行底翻成暖白），常态浅色 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true" android:color="@color/ui_on_accent" />
+    <item android:color="@color/ui_text_1" />
+</selector>

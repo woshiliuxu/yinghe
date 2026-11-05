@@ -17,8 +17,9 @@
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:duplicateParentState="true"
         android:text="@string/app_source"
-        android:textColor="@android:color/white"
+        android:textColor="@color/dialog_row_text"
         android:textSize="@dimen/ts_24" />
 
     <TextView
@@ -30,7 +31,8 @@
         android:id="@+id/tv_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
+        android:duplicateParentState="true"
+        android:textColor="@color/dialog_row_text"
         android:textSize="@dimen/ts_24" />
 
     <TextView
@@ -38,7 +40,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/vs_10"
         android:layout_marginLeft="@dimen/vs_10"
+        android:duplicateParentState="true"
         android:text=">"
-        android:textColor="@android:color/white"
+        android:textColor="@color/dialog_row_text"
         android:textSize="@dimen/ts_24" />
 </LinearLayout>

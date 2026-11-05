@@ -186,6 +186,15 @@ public class ImgUtil {
         }
     }
 
+    /**
+     * 给外部（首页背景模糊）用的入口：把 @User-Agent= / @Referer= 这类后缀解析成带 header 的请求。
+     * 豆瓣的图不带 Referer 会直接 403，而 updateBackdrop 那边是用 Glide 直接加载原始 url 的，
+     * 不经过这里就会一直是空的。
+     */
+    public static Object urlFor(String url) {
+        return getUrl(url);
+    }
+
     private static Object getUrl(String url) {
         if (url.startsWith("data:")) return url;
         url = DefaultConfig.checkReplaceProxy(url);

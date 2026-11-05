@@ -20,7 +20,7 @@
         android:padding="@dimen/vs_10"
         android:singleLine="true"
         android:text="@{name}"
-        android:textColor="@color/color_FFFFFF"
+        android:textColor="@color/dialog_row_text"
         android:textSize="@dimen/ts_26"
         tools:text="11111111111111" />
 
@@ -34,7 +34,8 @@
         android:clickable="true"
         android:focusable="true"
         android:padding="@dimen/vs_10"
-        android:src="@drawable/icon_delete" />
+        android:src="@drawable/icon_delete"
+        android:tint="@color/dialog_row_text" />
 
 </LinearLayout>
 

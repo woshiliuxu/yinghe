@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 左栏条目内的图标与文字：焦点在条目的暖白胶囊上时压成深色，否则保持暖白。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true" android:color="#0B0C0F" />
+    <item android:color="@color/color_theme" />
+</selector>

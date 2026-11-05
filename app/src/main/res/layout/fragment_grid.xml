@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 视频分类页面略缩图样式 -->
+<!-- 视频分类页面（2026 重设计 · 方案 A 内容全屏）
+     列宽不再写死：卡片用 match_parent 跟随 GridLayoutManager 分到的 span，
+     行列间距由 GridFragment 里的 ItemDecoration 统一给（左右各半、最后一列右为 0），
+     所以 7 列永远正好等于可用宽，不会溢出、也不会右侧留一条缝。
+     底部 padding 让最后一行能滚到信息条上方而不被盖住。 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -14,11 +18,10 @@
         android:layout_height="match_parent"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:paddingLeft="@dimen/vs_60"
-        android:paddingTop="@dimen/vs_40"
-        android:paddingRight="@dimen/vs_60"
-        android:paddingBottom="@dimen/vs_40"
-        app:tv_horizontalSpacingWithMargins="@dimen/vs_20"
-        app:tv_selectedItemIsCentered="true"
-        app:tv_verticalSpacingWithMargins="@dimen/vs_20" />
+        android:paddingLeft="@dimen/vs_0"
+        android:paddingTop="@dimen/vs_18"
+        android:paddingRight="@dimen/vs_0"
+        android:paddingBottom="@dimen/vs_24"
+        app:tv_horizontalSpacingWithMargins="@dimen/vs_0"
+        app:tv_verticalSpacingWithMargins="@dimen/vs_0" />
 </LinearLayout>

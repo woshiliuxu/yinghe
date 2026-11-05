@@ -1,13 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 略缩图加载占位图 -->
+<!-- 海报加载占位图（2026 重做）
+     旧版问题：一块几乎纯黑的圆角矩形，中间叠一个 250dp 的深色抽象图形，
+     在 144×216 的卡片里会被裁掉大半，只剩一团看不清的黑块 —— 看起来就像界面坏了。
+     新版：一张"空卡片"—— 上浅下深的竖向渐变（模拟一张竖版海报的明暗），
+     一层极细描边（让它有卡片边界，不是黑洞），中间一个小尺寸的品牌标记做暗示。
+     尺寸不写死：shape 没有 intrinsic size，ImageView 会按视图大小拉伸，任何卡片尺寸都铺满。 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
-        <shape>
+        <shape android:shape="rectangle">
             <corners android:radius="14px" />
+            <gradient
+                android:angle="270"
+                android:startColor="#22262E"
+                android:centerColor="#191C22"
+                android:endColor="#0F1114" />
+            <stroke
+                android:width="1px"
+                android:color="#1FFFFFFF" />
         </shape>
     </item>
     <item
         android:antialias="true"
-        android:gravity="center"
-        android:drawable="@drawable/icon_img_placeholder" />
+        android:drawable="@drawable/icon_img_placeholder"
+        android:gravity="center" />
 </layer-list>

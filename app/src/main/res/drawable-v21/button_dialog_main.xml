@@ -1,40 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="?attr/color_theme_dark_70">
-    <item>
-        <selector xmlns:android="http://schemas.android.com/apk/res/android">
-            <item
-                android:state_focused="true"
-                android:state_pressed="true">
-                <shape>
-                    <corners android:radius="@dimen/vs_5" />
-                    <solid android:color="?attr/color_theme_dark_70" />
-                </shape>
-            </item>
-            <item
-                android:state_focused="false"
-                android:state_pressed="true">
-                <shape>
-                    <corners android:radius="@dimen/vs_5" />
-                    <solid android:color="?attr/color_theme_dark_70" />
-                </shape>
-            </item>
-            <item android:state_focused="true">
-                <shape>
-                    <corners android:radius="@dimen/vs_5" />
-                    <solid android:color="?attr/color_theme_dark_70" />
-	    <!--添加选中边框-->
-	    <stroke android:width="2mm" android:color="@android:color/white" />
-                </shape>
-            </item>
-            <item
-                android:state_focused="false"
-                android:state_pressed="false">
-                <shape>
-                    <corners android:radius="@dimen/vs_5" />
-                    <solid android:color="@color/color_000000_60" />
-                </shape>
-            </item>
-        </selector>
+<!-- v21 版本会覆盖同名默认资源（layout-v21 踩过的坑在 drawable 重演），
+     必须与 drawable/button_dialog_main.xml 保持完全一致。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="#14161A" />
+        </shape>
     </item>
-</ripple>
+    <item android:state_pressed="true">
+        <shape>
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="#2E14161A" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="#0A14161A" />
+        </shape>
+    </item>
+</selector>

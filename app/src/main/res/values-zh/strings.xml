@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">TVBox</string>
-    <string name="app_home">首页</string>
-    <string name="app_source"></string>
+    <string name="app_name">影盒</string>
+    <string name="app_home">推荐</string>
+    <string name="app_source">https://盒子迷.top/禁止贩卖</string>
 
     // Home Page //
     <string name="hm_ok">加载成功</string>
@@ -58,6 +58,7 @@
     <string name="mn_live_boot">启动时进直播</string>
     <string name="mn_wall_change">换张壁纸</string>
     <string name="mn_wall_load">壁纸更换中</string>
+    <string name="mn_wall_fail">换壁纸失败，请检查网络</string>
     <string name="mn_wall_reset">重置壁纸</string>
     <string name="mn_play_type">播放器</string>
     <string name="mn_play_decode">IJK解码</string>
@@ -226,4 +227,12 @@
         <item>首选配置地址</item>
         <item>首选设置配置</item>
     </string-array>
+
+    <!-- 配置接口管理弹窗（多配置切换，2026-11-05） -->
+    <string name="dia_config_title">配置接口</string>
+    <string name="dia_config_tip">确认键切换配置，切换后自动重启生效；垃圾桶按钮删除</string>
+    <string name="dia_config_add">新增配置</string>
+    <string name="dia_config_in_use">使用中</string>
+    <string name="dia_config_del_cur">使用中的配置不能删除</string>
+    <string name="dia_config_deleted">已删除</string>
 </resources>

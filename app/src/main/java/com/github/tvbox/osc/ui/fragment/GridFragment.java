@@ -1,6 +1,7 @@
 package com.github.tvbox.osc.ui.fragment;
 import android.content.res.TypedArray;
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import com.blankj.utilcode.util.GsonUtils;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.api.ApiConfig;
@@ -22,6 +24,7 @@ import com.github.tvbox.osc.bean.AbsXml;
 import com.github.tvbox.osc.bean.Movie;
 import com.github.tvbox.osc.bean.MovieSort;
 import com.github.tvbox.osc.bean.SourceBean;
+import com.github.tvbox.osc.event.HomeFocusEvent;
 import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.ui.activity.DetailActivity;
 import com.github.tvbox.osc.ui.activity.FastSearchActivity;
@@ -34,13 +37,18 @@ import com.github.tvbox.osc.util.ImgUtil;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.HawkConfig;
+import com.github.tvbox.osc.util.HomeCache;
+import com.google.gson.reflect.TypeToken;
+import androidx.recyclerview.widget.GridLayoutManager;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
 import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
 import com.owen.tvrecyclerview.widget.V7GridLayoutManager;
 import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
+import me.jessyan.autosize.utils.AutoSizeUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import org.greenrobot.eventbus.EventBus;
@@ -64,6 +72,9 @@ public class GridFragment extends BaseLazyFragment {
     private boolean isLoad = false;
     private boolean isTop = true;
     private View focusedView = null;
+    private RecyclerView.ItemDecoration gridDecoration;
+    /** 本次进页面是否先铺了本地缓存（用于判断网络回来后要不要重绘） */
+    private boolean cachedShown = false;
 
     private static class GridInfo{
         public String sortID="";
@@ -188,8 +199,12 @@ public class GridFragment extends BaseLazyFragment {
             mGridView.setVisibility(View.VISIBLE);
         }
         mGridView.setHasFixedSize(true);
-        style=ImgUtil.initStyle();
+        // 网格模式不再让 ImgUtil 的 style 插手尺寸：style 会按自己的 ratio 重设卡片宽高，
+        // 和列宽对不上就会第 7 列溢出屏幕。现在尺寸全部交给 PosterCardLayout（宽跟列、高 2:3）。
+        style = isFolederMode() ? ImgUtil.initStyle() : null;
         gridAdapter = new GridAdapter(isFolederMode(), style);
+        // 海报墙只放图；片名走底部信息条。网盘浏览（文件夹模式）例外，那里必须靠文字认目录
+        gridAdapter.plainPoster = !isFolederMode();
         this.page = 1;
         this.maxPage = 1;
         this.isLoad = false;
@@ -201,14 +216,25 @@ public class GridFragment extends BaseLazyFragment {
         if (isFolederMode()) {
             mGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, 1, false));
         } else {
-            int spanCount = isBaseOnWidth() ? 5 : 6;
+            // 固定 5 列（用户 2026-11-04 统一要求：所有影片卡片一行 5 个）。
+            // 卡片宽度由 GridLayoutManager 把可用宽等分后交给 PosterCardLayout，
+            // 高度按 2:3 自动算，所以无论屏幕多宽都不会出现「第 5 列被切掉」。
+            final int spanCount = 5;
+            int realSpan = spanCount;
             if (style != null) {
-                spanCount = ImgUtil.spanCountByStyle(style, spanCount);
+                if (ImgUtil.spanCountByStyle(style, spanCount) == 1) realSpan = 1;
             }
-            if (spanCount == 1) {
-                mGridView.setLayoutManager(new V7LinearLayoutManager(mContext, spanCount, false));
+            if (realSpan == 1) {
+                mGridView.setLayoutManager(new V7LinearLayoutManager(mContext, realSpan, false));
             } else {
-                mGridView.setLayoutManager(new V7GridLayoutManager(mContext, spanCount));
+                mGridView.setLayoutManager(new V7GridLayoutManager(mContext, realSpan));
+                applyGridSpacing(realSpan);
+                mGridView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        applyCellHeight(spanCount);
+                    }
+                });
             }
         }
 
@@ -222,12 +248,21 @@ public class GridFragment extends BaseLazyFragment {
         mGridView.setOnItemListener(new TvRecyclerView.OnItemListener() {
             @Override
             public void onItemPreSelected(TvRecyclerView parent, View itemView, int position) {
-                itemView.animate().scaleX(1.0f).scaleY(1.0f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
+                // 焦点离开：不做缩放，只把轻微上浮收回去，并收起片名浮层。
+                // 缩放会盖住邻居，投影仪上尤其明显；焦点识别交给白描边。
+                itemView.animate().scaleX(1.0f).scaleY(1.0f)
+                        .translationY(0f)
+                        .setDuration(130).start();
+                setCardCaption(itemView, false);
             }
 
             @Override
             public void onItemSelected(TvRecyclerView parent, View itemView, int position) {
-                itemView.animate().scaleX(1.2f).scaleY(1.2f).setDuration(300).setInterpolator(new BounceInterpolator()).start();
+                itemView.animate().scaleX(1.0f).scaleY(1.0f)
+                        .translationY(-AutoSizeUtils.mm2px(mContext, 3))
+                        .setDuration(130).start();
+                setCardCaption(itemView, true);
+                postFocusInfo(position);
             }
 
             @Override
@@ -295,6 +330,93 @@ public class GridFragment extends BaseLazyFragment {
         setLoadSir(mGridView);
     }
 
+    /**
+     * 按实际可用宽算出「中间列宽 × 1.5」作为统一卡片高度。
+     *
+     * 必须在布局完成后再算：屏幕宽、侧栏宽、左右留白都可能因设备而异，
+     * 写死 mm 值就会在别的分辨率上错位（上一版 7 列溢出就是这么来的）。
+     */
+    private void applyCellHeight(int spanCount) {
+        if (mGridView == null || gridAdapter == null) return;
+        int usable = mGridView.getWidth() - mGridView.getPaddingLeft() - mGridView.getPaddingRight();
+        if (usable <= 0) return;
+        int gap = AutoSizeUtils.mm2px(mContext, 16);
+        int cellW = (usable - gap * (spanCount - 1)) / spanCount;
+        int cellH = (int) (cellW * 1.5f);
+        if (cellH > 0 && gridAdapter.cellHeight != cellH) {
+            gridAdapter.cellHeight = cellH;
+            gridAdapter.notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * 行列间距用 ItemDecoration 给，不用 TvRecyclerView 的 spacingWithMargins。
+     *
+     * 原因：spacingWithMargins 是往 item 上加 margin，而卡片宽是 match_parent（等于 span 宽），
+     * 再加 margin 就会把 7 列撑出屏幕——上一版「最右边那张被切掉三分之一」就是这么来的。
+     * 改成 decoration：GridLayoutManager 在测量时会把 decoration 的宽从 span 里扣掉，
+     * 列宽自然变成 (可用宽 - 6×gap) / 7，永远严丝合缝。
+     */
+    private void applyGridSpacing(final int spanCount) {
+        final int gap = AutoSizeUtils.mm2px(mContext, 16);
+        final int half = gap / 2;
+        if (gridDecoration != null) {
+            mGridView.removeItemDecoration(gridDecoration);
+        }
+        gridDecoration = new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view,
+                                       @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                int pos = parent.getChildAdapterPosition(view);
+                if (pos == RecyclerView.NO_POSITION) return;
+                // 左右一律各半：容器宽度已经为一个 gap 留了余量，
+                // 所以首末列不必特殊处理，7 列等宽、边缘正好压在设计稿的 136 / 1240 上。
+                outRect.left = half;
+                outRect.right = half;
+                outRect.top = 0;
+                outRect.bottom = gap;
+            }
+        };
+        mGridView.addItemDecoration(gridDecoration);
+    }
+
+    /**
+     * 只给「当前焦点」那张海报打开片名浮层。
+     *
+     * 首页 14 张卡片如果每张都印片名+备注，屏幕上就是 28 行小字互相打架；
+     * 常态留纯海报，焦点这一张才浮出字，信息密度和画面干净两头都占住。
+     * 文件夹模式（plainPoster=false）不走这里，那里必须常显文字才能认出目录。
+     */
+    private void setCardCaption(View itemView, boolean show) {
+        if (itemView == null || gridAdapter == null || !gridAdapter.plainPoster) return;
+        View box = itemView.findViewById(R.id.captionBox);
+        View scrim = itemView.findViewById(R.id.scrim);
+        if (box != null) box.setVisibility(show ? View.VISIBLE : View.GONE);
+        if (scrim != null) scrim.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * 把当前焦点海报的元信息送到首页底部信息条。
+     * position 可能是加载更多的那一行 footer，所以这里全部做边界保护。
+     */
+    private void postFocusInfo(int position) {
+        try {
+            if (gridAdapter == null) return;
+            List<Movie.Video> data = gridAdapter.getData();
+            if (data == null || position < 0 || position >= data.size()) {
+                EventBus.getDefault().post(new HomeFocusEvent(null, null, 0, null, null));
+                return;
+            }
+            Movie.Video video = data.get(position);
+            if (video == null) return;
+            String sourceName = "";
+            SourceBean sb = ApiConfig.get().getSource(video.sourceKey);
+            if (sb != null && sb.getName() != null) sourceName = sb.getName();
+            EventBus.getDefault().post(new HomeFocusEvent(video.name, video.note, video.year, sourceName, video.pic));
+        } catch (Exception ignored) {
+        }
+    }
+
     private void initViewModel() {
         if (sourceViewModel != null) {
             return;
@@ -308,7 +430,11 @@ public class GridFragment extends BaseLazyFragment {
                     if (page == 1) {
                         showSuccess();
                         isLoad = true;
-                        gridAdapter.setNewData(absXml.movie.videoList);
+                        if (!(cachedShown && sameAsNow(absXml.movie.videoList))) {
+                            replaceKeepPosition(absXml.movie.videoList);
+                        }
+                        cachedShown = false;
+                        HomeCache.put(cacheKey(), GsonUtils.toJson(absXml.movie.videoList));
                     } else {
                         gridAdapter.addData(absXml.movie.videoList);
                     }
@@ -346,11 +472,65 @@ public class GridFragment extends BaseLazyFragment {
             showEmpty();
             return;
         }
-        showLoading();
         isLoad = false;
         scrollTop();
         toggleFilterStatus();
+
+        // 先铺上次的缓存，再发请求。
+        // 这一步是"冷启动不黑屏"的关键：配置和分类都从本地读出来之后，
+        // 海报其实已经在硬盘里躺着了，没有必要让用户盯着一块空白等网络。
+        cachedShown = (page == 1) && showCached();
+        if (!cachedShown) showLoading();
         sourceViewModel.getList(sortData, page);
+    }
+
+    /** 缓存文件的 key：站点 + 分类 + 当前筛选条件，换源或换筛选自然不命中 */
+    private String cacheKey() {
+        String sourceKey = ApiConfig.get().getHomeSourceBean() == null ? "" : ApiConfig.get().getHomeSourceBean().getKey();
+        String sortId = sortData == null ? "" : sortData.id;
+        String filter = (sortData == null || sortData.filterSelect == null) ? "" : sortData.filterSelect.toString();
+        return HomeCache.PREFIX_LIST + sourceKey + "_" + sortId + "_" + filter;
+    }
+
+    private boolean showCached() {
+        if (gridAdapter == null || gridAdapter.getData().size() > 0) return false;
+        String json = HomeCache.get(cacheKey());
+        if (json == null) return false;
+        try {
+            List<Movie.Video> list = GsonUtils.fromJson(json, new TypeToken<List<Movie.Video>>() {
+            }.getType());
+            if (list == null || list.isEmpty()) return false;
+            showSuccess();
+            gridAdapter.setNewData(list);
+            isLoad = true;
+            return true;
+        } catch (Throwable th) {
+            return false;
+        }
+    }
+
+    /** 网络回来后判断和缓存是不是同一批：同一批就不重绘，免得焦点被打回第一张 */
+    private boolean sameAsNow(List<Movie.Video> list) {
+        if (gridAdapter == null) return false;
+        List<Movie.Video> now = gridAdapter.getData();
+        if (now == null || now.size() != list.size()) return false;
+        for (int i = 0; i < list.size(); i++) {
+            String a = now.get(i).id;
+            String b = list.get(i).id;
+            if (a == null ? b != null : !a.equals(b)) return false;
+        }
+        return true;
+    }
+
+    /** 替换数据时把滚动位置留住，别让用户正在看的那一排突然跳走 */
+    private void replaceKeepPosition(List<Movie.Video> list) {
+        int keep = 0;
+        if (mGridView != null && mGridView.getLayoutManager() instanceof GridLayoutManager) {
+            keep = ((GridLayoutManager) mGridView.getLayoutManager()).findFirstVisibleItemPosition();
+            if (keep < 0) keep = 0;
+        }
+        gridAdapter.setNewData(list);
+        if (keep > 0 && keep < list.size()) mGridView.scrollToPosition(keep);
     }
 
     private void toggleFilterStatus() {

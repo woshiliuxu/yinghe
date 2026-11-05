@@ -4,306 +4,163 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover">
-	<meta name="wechat-enable-text-zoom-em" content="true">
-	<title>TVBox</title>
-	<meta name="layoutmode" content="standard">
-	<link rel="stylesheet" type="text/css" href="style.css">
-	<link rel="stylesheet" type="text/css" href="ui.css">
+	<title>影盒 · 手机助手</title>
+	<link rel="stylesheet" type="text/css" href="yhg.css">
 </head>
 
 <body>
 	<div class="page">
-		<div class="page__bd" style="height: 100%;">
-			<div class="weui-tab">
-				<div id="panel1" role="tabpanel" aria-labelledby="tab1" class="weui-tab__panel">
-					<div class="weui-form">
-						<div class="weui-form__text-area">
-							<h2 class="weui-form__title">TVBox . 搜索</h2>
-						</div>
-						<div class="weui-form__control-area">
-							<div class="weui-cells__group weui-cells__group_form">
-								<div class="weui-cells">
-									<div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-										<div class="weui-cell__bd weui-flex">
-											<input id="search_key_word"
-												class="weui-input weui-cell__control weui-cell__control_flex"
-												type="text" value="" placeholder="请输入搜索的关键字..." />
-											<button onclick="search(); return false;"
-												class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">搜索</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div id="panel2" role="tabpanel" aria-labelledby="tab2" class="weui-tab__panel" style="display: none;">
-					<div class="weui-form">
-						<div class="weui-form__text-area">
-							<h2 class="weui-form__title">TVBox . 推送</h2>
-						</div>
-						<div class="weui-form__control-area">
-							<div class="weui-cells__group weui-cells__group_form">
-								<div class="weui-cells">
-									<div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-										<div class="weui-cell__bd weui-flex">
-											<input id="push_url"
-												class="weui-input weui-cell__control weui-cell__control_flex"
-												type="text" value="" placeholder="请输入需要推送播放的地址..." />
-										</div>
-									</div>
-									<div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-										<div class="weui-cell__bd weui-flex">
-											<button onclick="push(); return false;"
-													class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">推送</button>
-										</div>
-										<div class="weui-cell__bd weui-flex">
-											<button onclick="$('#push_url').val('');"
-													class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">清空</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div id="panel3" role="tabpanel" aria-labelledby="tab3" class="weui-tab__panel" style="display: none;">
-					<div class="weui-form" style="min-height: 0;">
-						<div class="weui-form__text-area">
-							<h2 class="weui-form__title">TVBox . 接口</h2>
-						</div>
-						<div class="weui-form__control-area" style="margin-bottom: 0px !important;">
-							<div class="weui-cells__group weui-cells__group_form">
-								<div class="weui-cells">
-									<div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-										<div class="weui-cell__bd weui-flex">
-											<input id="diy_api_url"
-												class="weui-input weui-cell__control weui-cell__control_flex"
-												type="text" value="" placeholder="1. 请输入数据源地址" />
-											<button onclick="api(); return false;"
-												class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">确定</button>
-										</div>
-									</div>
-									<div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-										<div class="weui-cell__bd weui-flex">
-											<input id="diy_live_url"
-													class="weui-input weui-cell__control weui-cell__control_flex"
-													type="text" value="" placeholder="2. 请输入直播源地址 (optional)" />
-											<button onclick="live(); return false;"
-													class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">确定</button>
-										</div>
-									</div>
-									<div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-										<div class="weui-cell__bd weui-flex">
-											<input id="diy_epg_url"
-													class="weui-input weui-cell__control weui-cell__control_flex"
-													type="text" value="" placeholder="3. 请输入直播EPG地址 (optional)" />
-											<button onclick="epg(); return false;"
-													class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">确定</button>
-										</div>
-									</div>
-									<div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-										<div class="weui-cell__bd weui-flex">
-											<input id="diy_proxy_server"
-													class="weui-input weui-cell__control weui-cell__control_flex"
-													type="text" value="" placeholder="socks代理服务器IP:端口,……，exo播放失败时通过代理播放" />
-											<button onclick="proxys(); return false;"
-													class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">确定</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="weui-form" style="padding-top: 50px; min-height: 0;">
-						<div class="weui-form__text-area">
-							<h2 class="weui-form__title">本地文件</h2>
-						</div>
-						<input type="file" id="file_uploader" style="display:none;" onchange="uploadTip()" multiple />
-						<div class="weui-form__control-area" style="text-align: center;margin-bottom: 10px !important;">
-							<div class="button-sp-area" style="margin-top: 10px;">
-								<a href="javascript:void(0)" role="button"
-									class="weui-btn weui-btn_mini weui-btn_default weui-wa-hotarea"
-									href="javascript:void(0)" onclick="uploadFile()">上传文件</a>&nbsp;
-								<a href="javascript:void(0)" role="button"
-									class="weui-btn weui-btn_mini weui-btn_default weui-wa-hotarea"
-									href="javascript:void(0)" onclick="newFolder()">新建文件夹</a>&nbsp;
-								<a id="delCurFolder" href="javascript:void(0)" role="button"
-									class="weui-btn weui-btn_mini weui-btn_warn weui-wa-hotarea"
-									href="javascript:void(0)" onclick="delFolder()" style="display: none;">删除当前文件夹</a>
-							</div>
-						</div>
-						<div class="weui-cells" id="file_list">
-						</div>
-					</div>
-				</div>
-				<div role="tablist" class="weui-tabbar">
-					<div id="tab1" role="tab" aria-labelledby="t1_title" aria-selected="true" aria-controls="panel1"
-						class="weui-tabbar__item weui-bar__item_on">
-						<img style="width: 20px; height: 20px; margin: 5px 0 5px 0;"
-							src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAuQAAALkB4qdB6AAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAKfSURBVFiFxdfPi1ZVGMDxz31HCnOq0ZkK00THlxhpIToELdxILkQMRMN1bly1EAlxY/0BswqiFi7KnW3aBSJFKTg2iJY/CsIfEZqjmSJiipKdFvfR9/Jy7zv3bd55PXA4l3vO8zzf85zznPOcLKWkU8mybCE2YhPGsATDuIGr+Blf43BK6U5HZWUlpVRaMQ/78ACpRr2H3WhU6SyrWZkHsixbjc+xJpSfwUmcivZCeGMtxqO+EeLHsCOldL5rD2AAH+FhGP4Nb9eZCd7BHwVv7Kol16bkk1DwLz7FYDfuxBC+KCzLh7UBsLMguLUbwyUgOwoT2T4jABbjbgh9NhvjBYiDoe8vDM0EsD8GX8CCHgEskodpwkSHcYbxT7hrXS+MF5RvCoC/8VwVwHsx6JdeGi8YmA79W8r6G9gcEXmiVtx2X05Gu7mss4FmnwCaZZ0N+dneD4AlZZ0NDMb39TkCeKz3mSqA6fheO0cAa6I9XQVwJb7fnCOA8WhPVQFMPk0AeEsep7cxv8dnwItaN+trVQdRhvMx6OMeAxwIvd/OdBe8q3V7re+R8S1auUGzI0AIHAmB3/HCLI2/JA+/hL0dxxaEFssjIuEoVvxP42PyQy3JQ29eLYAQHsefIXwX75PnjTUMD2AP7mslNsfxfG2Agvu+LCj5PtazaheviD00VZCZLExkstOSdprRtsI6Pq43cEieO36Dm239l0QKJs+Sr8X/KRVZ0UxuHcEEfm0zVKz38SM+wLNt8qu08oETWNhuo/RdUFayLFup9TIakqdv53AxpfSog9zr+A6vBuiGlNKtJwNmE25dREYTl8MTP2Gk1hL0GGJUfsYknMXLfQUIiOXy11aSP2pfqb0HelWyLFsm3xOj+KHvAAGxFF/h8n+GU+2I7XnhZwAAAABJRU5ErkJggg=="
-							alt="" class="weui-tabbar__icon">
-						<p id="t1_title" aria-hidden="true" class="weui-tabbar__label">搜索</p>
-					</div>
-					<div id="tab2" role="tab" aria-labelledby="t2_title" aria-selected="false" aria-controls="panel2"
-						class="weui-tabbar__item">
-						<img style="width: 20px; height: 20px; margin: 5px 0 5px 0;"
-							src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAuQAAALkB4qdB6AAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAJlSURBVFiF7ddNSNRBGMfxzy6B4aUsoxfMXiQwO1kEHewQXUI6FXWqIIzQgii69XILOnToFlYE3SMSkiCJolsW7CUIen+j6FJBiGWm02FHG9fddZdELw48/Hdmfs/zfGfmYZjNhBDMZsvOavY5AMyrRpzJZLagHRuj1eAFnqI7hJCrmiCEMKVhIa5gFKGM9aGhkpjjsStI3orPMcEPXMQeNKAeW3Ea36LmEzZNCwAW4FUM/BItZbR1uBm1X7F8OgBuxIDPUFfBbtXgYfS5/V8A2JycbXvFW8pajCS71o29qK8W4FQMcr/EfAOeIIfVBXM9RQp0AIeqAbgfHSc7sTKpjYB3WJPMz0MzduMs3ibam1hUEgDz0Ymh6NBWJPnrIit8n0IU+NTiPH4X7mqhsANfCgLXJ/ONSfJconmUQKwts6ttCUTHBACcSwL24WB6tliFN0nyRYl+QQLxAU1lIE5E3XcsGxs8GQcH0VnEaVVyjrmxMxwDiL9TiI9TQIzV11FYKn/DBewv4fCkMHkhQBGIp2UAuqLmGlyInZ4yDpfRmyYvBpBA3ML1MvGakgV5EDu7SjmUCTQJoEK/xdH3RxYb5Fu/mWvN8fssi+HYGZxBgG3x25+VLzBYNxOZM5lMLY7F7t0sHsfOvpkAwHEswb0Qwh1YIf+YGMSOKoupF71V6Lfjj/yxt4zfhHH1IU4crraqK0zeKv9QCTgyPp4ILvl3teZwBuunKXkHfsbYJybMFQh3+vf+m24bQNckuCK0C3EAV/Ecv6INRfsdbTixP9FGoo2a+ILuQWOx3cnEpLPWZv2f0RzAX4u0r6Ikm0C7AAAAAElFTkSuQmCC"
-							alt="" class="weui-tabbar__icon">
-						<p aria-hidden="true" id="t2_title" class="weui-tabbar__label">推送</p>
-					</div>
-					<div id="tab3" role="tab" aria-labelledby="t3_title" aria-selected="false" aria-controls="panel3"
-						class="weui-tabbar__item">
-						<img style="width: 20px; height: 20px; margin: 5px 0 5px 0;"
-							src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAAC5AAAAuQHip0HoAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAANtQTFRF////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhQHXOQAAAEh0Uk5TAAECBAUGCQoNDxITGiAhKC4xMjM0Nzg8P0BDT1dmbHR4fX+MlpedoKOkp6issri5vL2/zs/S19zd4OHi5OXp7e/x8/f6+/z+bkNkuAAAATRJREFUOMuNk2kzAmAUhR8iUSHSokWobCFLtFBI9fz/X+RDzdQY9brfzl3mbufAghVfVF+KLLHoh6p+RJckHGkxmSzq0ZKEjF2ArplfgcPjHYBC2w5Ax3YBYOf4cBovjfw82dy71/ElwOVY7/c2Tz4dlQB2h6q9b3uVxLQiUen53VMd7gINWwflgT7G503jjzoop55sQN5JBuK12sbiWBu1WhzSE/PcectSu/WOjs31uWcrm92ao/WmHc70OTtzbNfHOq5vz2D2Wc9Yq3zpBQCxV+339TUGwIV+VdaAxIMtAKq+5SD3bhWAlg+zvc+9BogMzQHkHEYAbjyf9bryFGDf/hT33Qc49eq/CaEWgSGDawYPFTx18Fl5J+mV76bhU2oVYcKUC5I2TPuwcP4tvaB4/5T/D6drVhrBHvH6AAAAAElFTkSuQmCC"
-							alt="" class="weui-tabbar__icon">
-						<p id="t3_title" aria-hidden="true" class="weui-tabbar__label">配置</p>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="fileInfoDialog" role="dialog" aria-modal="false" aria-hidden="true" style="display: none;">
-		<div role="button" class="weui-mask"></div>
-		<div class="weui-half-screen-dialog">
-			<div class="weui-half-screen-dialog__hd">
-				<div class="weui-half-screen-dialog__hd__main">
-					文件接口
-					<span class="weui-half-screen-dialog__tips" role="option">
-						点击使用时请打开应用内接口设置对话框
-					</span>
-				</div>
-			</div>
-			<div class="weui-half-screen-dialog__bd" id="fileInfo">
-				<div class="weui-form__control-area" style="margin-bottom: 0px !important;">
-					<div class="weui-cells__group weui-cells__group_form">
-						<div class="weui-cells">
-							<!-- <div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-								<div class="weui-cell__hd"><label class="weui-label">测试地址</label></div>
-							</div>
-							<div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-								<div class="weui-cell__bd weui-flex">
-									<input id="fileUrl0" class="weui-input weui-cell__control weui-cell__control_flex"
-										type="text" value="" readonly />
+		<div class="page__bd">
 
-								</div>
-							</div> -->
-							<div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-								<div class="weui-cell__hd"><label class="weui-label">本机地址</label></div>
-								<div class="weui-cell__bd weui-flex"><button onclick="fileToApi(1); return false;"
-										class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">使用</button>
-								</div>
-							</div>
-							<div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-								<div class="weui-cell__bd weui-flex">
-									<input id="fileUrl1" class="weui-input weui-cell__control weui-cell__control_flex"
-										type="text" value="" readonly />
+			<!-- ── 页面 1：搜索 ── -->
+			<section class="yhg-view" id="viewSearch">
+				<h2 class="yhg-view__title">搜索</h2>
 
-								</div>
-							</div>
-							<div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-								<div class="weui-cell__hd"><label class="weui-label">局域网地址</label></div>
-								<div class="weui-cell__bd weui-flex"><button onclick="fileToApi(2); return false;"
-										class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">使用</button>
-								</div>
-							</div>
-							<div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-								<div class="weui-cell__bd weui-flex">
-									<input id="fileUrl2" class="weui-input weui-cell__control weui-cell__control_flex"
-										type="text" value="" readonly />
+				<div class="search-bar">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+						stroke-linecap="round" stroke-linejoin="round">
+						<circle cx="11" cy="11" r="7" />
+						<path d="M20 20l-3.6-3.6" />
+					</svg>
+					<input id="search_key_word" type="text" value="" placeholder="想看什么，输就完了"
+						autocomplete="off" />
+					<button class="sb-clear" onclick="$('#search_key_word').val('').focus(); return false;"
+						aria-label="清空">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+							stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="12" r="8" fill="rgba(255,255,255,0.14)" stroke="none" />
+							<path d="M9.5 9.5l5 5M14.5 9.5l-5 5" />
+						</svg>
+					</button>
+				</div>
 
-								</div>
-							</div>
-						</div>
+				<p class="yhg-hint">按键盘上的「搜索 / 换行」键，结果会直接在电视上打开。</p>
+
+				<div class="yhg-history" id="searchHistory">
+					<div class="yhg-history__hd">
+						<span>最近搜索</span>
+						<button id="hisClear" type="button">清空</button>
+					</div>
+					<div class="yhg-history__chips" id="hisChips"></div>
+				</div>
+			</section>
+
+			<!-- ── 页面 2：推送 ── -->
+			<section class="yhg-view" id="viewPush">
+				<h2 class="yhg-view__title">推送播放</h2>
+
+				<div class="search-bar">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+						stroke-linecap="round" stroke-linejoin="round">
+						<path d="M12 4v10" />
+						<path d="M8 10.5l4 4 4-4" />
+						<path d="M5 18.5h14" />
+					</svg>
+					<input id="push_url" type="text" value="" placeholder="粘贴视频 / 直播 / 磁力地址"
+						autocomplete="off" />
+					<button class="sb-clear" onclick="$('#push_url').val('').focus(); return false;" aria-label="清空">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+							stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="12" r="8" fill="rgba(255,255,255,0.14)" stroke="none" />
+							<path d="M9.5 9.5l5 5M14.5 9.5l-5 5" />
+						</svg>
+					</button>
+				</div>
+
+				<button onclick="push(); return false;" class="yhg-btn-primary">推送到电视</button>
+
+				<p class="yhg-hint">按键盘上的「换行」键也能直接推送。</p>
+			</section>
+
+			<!-- ── 页面 3：配置 ── -->
+			<section class="yhg-view" id="viewConfig">
+				<h2 class="yhg-view__title">配置</h2>
+
+				<div class="search-bar">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+						stroke-linecap="round" stroke-linejoin="round">
+						<path
+							d="M9.5 4.5h5l1 2.5H20a1 1 0 0 1 1 1V18a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18V8a1 1 0 0 1 1-1h4.5z" />
+						<circle cx="12" cy="13" r="3.2" />
+					</svg>
+					<input id="diy_api_url" type="text" value="" placeholder="粘贴数据源配置地址" autocomplete="off" />
+				</div>
+
+				<button onclick="api(); return false;" class="yhg-btn-primary">立即生效</button>
+
+				<div class="yhg-group-hd" onclick="toggleAdv()">
+					<span>高级选项</span>
+					<span class="yhg-group-hd__sub">直播源 · EPG · 代理</span>
+					<svg class="yhg-chev" id="advChev" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+						stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M6 9.5l6 6 6-6" />
+					</svg>
+				</div>
+
+				<div class="yhg-adv" id="advBody">
+					<div class="adv-row">
+						<input id="diy_live_url" type="text" value="" placeholder="直播源地址" autocomplete="off" />
+						<button onclick="live(); return false;">确定</button>
+					</div>
+					<div class="adv-row">
+						<input id="diy_epg_url" type="text" value="" placeholder="直播 EPG 地址" autocomplete="off" />
+						<button onclick="epg(); return false;">确定</button>
+					</div>
+					<div class="adv-row">
+						<input id="diy_proxy_server" type="text" value="" placeholder="socks 代理 IP:端口"
+							autocomplete="off" />
+						<button onclick="proxys(); return false;">确定</button>
 					</div>
 				</div>
-			</div>
-			<div class="weui-half-screen-dialog__ft" style="padding-bottom: 30px;">
-				<div class="weui-half-screen-dialog__btn-area">
-					<a href="javascript:void(0)" class="weui-btn weui-btn_default" onclick="hideFileInfo()">关闭</a>
-					<a href="javascript:void(0)" id="delFileBtn" class="weui-btn weui-btn_warn"
-						onclick="delFile()">删除文件</a>
-				</div>
-			</div>
+
+				<p class="yhg-hint">配置地址也可以在电视端「设置 → 配置接口」里切换。</p>
+			</section>
 		</div>
 	</div>
 
-	<div role="dialog" aria-hidden="true" aria-modal="true" id="uploadTip" style="display: none;">
-		<div class="weui-mask"></div>
-		<div class="weui-dialog">
-			<div class="weui-dialog__hd"><strong class="weui-dialog__title">确认上传?</strong></div>
-			<div class="weui-dialog__bd" id="uploadTipContent"></div>
-			<div class="weui-dialog__ft">
-				<a role="button" href="javascript:void(0)" onclick="doUpload(0)"
-					class="weui-dialog__btn weui-dialog__btn_default">取消</a>
-				<a role="button" href="javascript:void(0)" onclick="doUpload(1)"
-					class="weui-dialog__btn weui-dialog__btn_primary">确定</a>
-			</div>
+	<!-- 液态玻璃导航栏 -->
+	<nav class="lg-dock" role="tablist">
+		<div class="lg-dock__item" id="dockSearch" role="tab" aria-selected="false" onclick="switchView('Search')">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+				stroke-linecap="round" stroke-linejoin="round">
+				<circle cx="11" cy="11" r="7" />
+				<path d="M20 20l-3.6-3.6" />
+			</svg>
+			<p>搜索</p>
 		</div>
-	</div>
-
-	<div role="dialog" aria-hidden="true" aria-modal="true" id="newFolder" style="display: none;">
-		<div class="weui-mask"></div>
-		<div class="weui-dialog">
-			<div class="weui-dialog__hd"><strong class="weui-dialog__title">新建文件夹</strong></div>
-			<div class="weui-dialog__bd">
-				<input id="newFolderContent" class="weui-input weui-cell__control weui-cell__control_flex" type="text"
-					value="" placeholder="请输入文件夹名称..." />
-			</div>
-			<div class="weui-dialog__ft">
-				<a role="button" href="javascript:void(0)" onclick="doNewFolder(0)"
-					class="weui-dialog__btn weui-dialog__btn_default">取消</a>
-				<a role="button" href="javascript:void(0)" onclick="doNewFolder(1)"
-					class="weui-dialog__btn weui-dialog__btn_primary">确定</a>
-			</div>
+		<div class="lg-dock__item" id="dockPush" role="tab" aria-selected="false" onclick="switchView('Push')">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+				stroke-linecap="round" stroke-linejoin="round">
+				<path d="M12 4v10" />
+				<path d="M8 10.5l4 4 4-4" />
+				<path d="M5 18.5h14" />
+			</svg>
+			<p>推送</p>
 		</div>
-	</div>
-
-	<div role="dialog" aria-hidden="true" aria-modal="true" id="delFolder" style="display: none;">
-		<div class="weui-mask"></div>
-		<div class="weui-dialog">
-			<div class="weui-dialog__hd"><strong class="weui-dialog__title">删除文件夹</strong></div>
-			<div class="weui-dialog__bd" id="delFolderContent"></div>
-			<div class="weui-dialog__ft">
-				<a role="button" href="javascript:void(0)" onclick="doDelFolder(0)"
-					class="weui-dialog__btn weui-dialog__btn_default">取消</a>
-				<a role="button" href="javascript:void(0)" onclick="doDelFolder(1)"
-					class="weui-dialog__btn weui-dialog__btn_primary">确定</a>
-			</div>
+		<div class="lg-dock__item is-on" id="dockConfig" role="tab" aria-selected="true" onclick="switchView('Config')">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+				stroke-linecap="round" stroke-linejoin="round">
+				<path
+					d="M9.5 4.5h5l1 2.5H20a1 1 0 0 1 1 1V18a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18V8a1 1 0 0 1 1-1h4.5z" />
+				<circle cx="12" cy="13" r="3.2" />
+			</svg>
+			<p>配置</p>
 		</div>
-	</div>
-
-	<div role="dialog" aria-hidden="true" aria-modal="true" id="delFile" style="display: none;">
-		<div class="weui-mask"></div>
-		<div class="weui-dialog">
-			<div class="weui-dialog__hd"><strong class="weui-dialog__title">删除文件</strong></div>
-			<div class="weui-dialog__bd" id="delFileContent"></div>
-			<div class="weui-dialog__ft">
-				<a role="button" href="javascript:void(0)" onclick="doDelFile(0)"
-					class="weui-dialog__btn weui-dialog__btn_default">取消</a>
-				<a role="button" href="javascript:void(0)" onclick="doDelFile(1)"
-					class="weui-dialog__btn weui-dialog__btn_primary">确定</a>
-			</div>
-		</div>
-	</div>
+	</nav>
 
 	<div role="alert" id="warnToast" style="display: none;">
 		<div class="weui-mask_transparent"></div>
-		<div class="weui-toast">
-			<i class="weui-icon-warn weui-icon_toast"></i>
-			<p class="weui-toast__content" id="warnToastContent"></p>
+		<div class="yhg-toast" id="warnToastBox">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+				stroke-linejoin="round">
+				<circle cx="12" cy="12" r="9" />
+				<path d="M12 7.5v5.5" />
+				<path d="M12 16.4v.2" />
+			</svg>
+			<p class="yhg-toast__content" id="warnToastContent"></p>
 		</div>
 	</div>
 
-	<div role="alert" id="loadingToast" style="display: none;">
-		<div class="weui-mask_transparent"></div>
-		<div class="weui-toast">
-			<span class="weui-primary-loading weui-icon_toast">
-				<span class="weui-primary-loading__dot"></span>
-			</span>
-			<p class="weui-toast__content">加载中</p>
-		</div>
-	</div>
 	<script src="jquery.js"></script>
 	<script src="script.js"></script>
 </body>

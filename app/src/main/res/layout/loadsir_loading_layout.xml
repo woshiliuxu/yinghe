@@ -1,13 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 加载占位（2026 重设计）
+     原来是屏幕正中一个 50 的转圈，投到墙上就是"一片黑里一个小圈"。
+     现在改成骨架：先把即将出现的 7×2 海报位置画成半透明块，
+     加载完成时卡片直接填进这些位置，视觉上是"图进来了"，而不是黑屏跳变。 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ProgressBar
-        android:layout_width="@dimen/vs_50"
-        android:layout_height="@dimen/vs_50"
-        android:layout_gravity="center"
-        android:indeterminateBehavior="repeat"
-        android:indeterminateDrawable="@drawable/anim_loading"
-        android:indeterminateOnly="true" />
+    <com.github.tvbox.osc.ui.tv.widget.SkeletonView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="@dimen/vs_42" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_marginTop="@dimen/vs_4"
+        android:layout_marginStart="@dimen/vs_28"
+        android:letterSpacing="0.06"
+        android:text="正在获取片源"
+        android:textColor="@color/ui_text_3"
+        android:textSize="@dimen/ts_20" />
+
 </FrameLayout>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 分组卡右侧「N 项」计数： tertiary 层级。
+     聚焦翻白底时压成半透明深色，别抢主文字的对比度。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true" android:color="#660B0C0F" />
+    <item android:state_activated="true" android:color="#A9ACB4" />
+    <item android:color="#7E818A" />
+</selector>

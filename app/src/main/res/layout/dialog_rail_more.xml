@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 左栏「个人」菜单（2026-11-05 重写：亮面板版）。
+     投影对比度差，跟随全弹窗翻亮：暖白纸面 + 深色字，
+     行聚焦反色深底白字（button_dialog_main + dialog_row_text）。
+     图标用 inline SVG stroke 资源（与整机图标语言一致），tint 跟行状态翻色。
+     左栏改版后底部只留「个人」，设置 / 切换接口收拢在这里。 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="@dimen/vs_420"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_dialog_bg"
+        android:orientation="vertical"
+        android:padding="@dimen/vs_16">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/vs_12"
+            android:layout_marginLeft="@dimen/vs_12"
+            android:layout_marginTop="@dimen/vs_8"
+            android:text="个人"
+            android:textColor="@color/dialog_text_main"
+            android:textSize="@dimen/ts_26" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/vs_12"
+            android:layout_marginLeft="@dimen/vs_12"
+            android:layout_marginTop="@dimen/vs_4"
+            android:layout_marginBottom="@dimen/vs_16"
+            android:text="设置与数据源切换"
+            android:textColor="@color/dialog_text_sub"
+            android:textSize="@dimen/ts_12" />
+
+        <LinearLayout
+            android:id="@+id/railMenuSettings"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/vs_70"
+            android:background="@drawable/button_dialog_main"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/vs_20"
+            android:paddingLeft="@dimen/vs_20"
+            android:paddingEnd="@dimen/vs_16"
+            android:paddingRight="@dimen/vs_16">
+
+            <ImageView
+                android:layout_width="@dimen/vs_22"
+                android:layout_height="@dimen/vs_22"
+                android:duplicateParentState="true"
+                android:src="@drawable/set_setting"
+                android:tint="@color/dialog_row_text" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/vs_14"
+                android:layout_marginLeft="@dimen/vs_14"
+                android:duplicateParentState="true"
+                android:text="设置"
+                android:textColor="@color/dialog_row_text"
+                android:textSize="@dimen/ts_15" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:duplicateParentState="true"
+                android:text="›"
+                android:textColor="@color/dialog_text_sub"
+                android:textSize="@dimen/ts_15" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/railMenuSite"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/vs_70"
+            android:layout_marginTop="@dimen/vs_4"
+            android:background="@drawable/button_dialog_main"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/vs_20"
+            android:paddingLeft="@dimen/vs_20"
+            android:paddingEnd="@dimen/vs_16"
+            android:paddingRight="@dimen/vs_16">
+
+            <ImageView
+                android:layout_width="@dimen/vs_22"
+                android:layout_height="@dimen/vs_22"
+                android:duplicateParentState="true"
+                android:src="@drawable/hm_left_right"
+                android:tint="@color/dialog_row_text" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/vs_14"
+                android:layout_marginLeft="@dimen/vs_14"
+                android:duplicateParentState="true"
+                android:text="切换接口"
+                android:textColor="@color/dialog_row_text"
+                android:textSize="@dimen/ts_15" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:duplicateParentState="true"
+                android:text="›"
+                android:textColor="@color/dialog_text_sub"
+                android:textSize="@dimen/ts_15" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

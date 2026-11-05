@@ -34,9 +34,11 @@
     <dimen name="vs_20">20mm</dimen>
     <dimen name="vs_25">25mm</dimen>
     <dimen name="vs_30">30mm</dimen>
+    <dimen name="vs_32">32mm</dimen>
     <dimen name="vs_33">33mm</dimen>
     <dimen name="vs_35">35mm</dimen>
     <dimen name="vs_40">40mm</dimen>
+    <dimen name="vs_42">42mm</dimen>
     <dimen name="vs_45">45mm</dimen>
     <dimen name="vs_50">50mm</dimen>
     <dimen name="vs_55">55mm</dimen>
@@ -73,4 +75,98 @@
     <dimen name="vs_640">640mm</dimen>
     <dimen name="vs_720">720mm</dimen>
     <dimen name="vs_960">960mm</dimen>
+
+    <!-- 2026 重设计：新增尺寸（同一套 mm 刻度，数值即 1280x720 设计稿像素） -->
+    <dimen name="vs_16">16mm</dimen>
+    <dimen name="vs_18">18mm</dimen>
+    <dimen name="vs_22">22mm</dimen>
+    <dimen name="vs_24">24mm</dimen>
+    <dimen name="vs_26">26mm</dimen>
+    <dimen name="vs_28">28mm</dimen>
+    <dimen name="vs_36">36mm</dimen>
+    <dimen name="vs_44">44mm</dimen>
+    <dimen name="vs_88">88mm</dimen>
+    <dimen name="vs_168">168mm</dimen>
+    <dimen name="vs_136">136mm</dimen>
+    <dimen name="vs_208">208mm</dimen>
+    <dimen name="vs_144">144mm</dimen>
+    <dimen name="vs_162">162mm</dimen>
+    <dimen name="vs_236">236mm</dimen>
+    <dimen name="vs_224">224mm</dimen>
+    <dimen name="vs_252">252mm</dimen>
+
+    <!-- 详情页方案 C（2026-11-04）：1280x720 设计稿坐标，1mm=1px。
+         左栏 420x680 @20,20；右侧 768 宽 @472,20；7 列剧集卡 gap16。 -->
+    <dimen name="vs_56">56mm</dimen>
+    <dimen name="vs_64">64mm</dimen>
+    <dimen name="vs_48">48mm</dimen>
+    <dimen name="vs_17">17mm</dimen>
+    <dimen name="vs_96">96mm</dimen>
+    <dimen name="vs_204">204mm</dimen>
+    <dimen name="vs_209">209mm</dimen>
+    <dimen name="vs_306">306mm</dimen>
+    <dimen name="vs_372">372mm</dimen>
+    <dimen name="vs_472">472mm</dimen>
+    <dimen name="vs_680">680mm</dimen>
+    <dimen name="vs_768">768mm</dimen>
+    <dimen name="ts_46">46mm</dimen>
+    <dimen name="vs_76">76mm</dimen>
+    <dimen name="vs_176">176mm</dimen>
+    <dimen name="vs_13">13mm</dimen>
+    <dimen name="vs_178">178mm</dimen>
+    <dimen name="vs_86">86mm</dimen>
+
+    <!-- 详情页方案 B（2026-11-04 二次重做）：剧照通栏 + 6 列大格。
+         左侧信息 x56 y150 宽 520；动作行贴底 74；右侧 x648 y118 宽 576 高 572；
+         剧集格 86x62（576 = 6×86 + 5×12），gap 12。 -->
+    <dimen name="vs_62">62mm</dimen>
+    <dimen name="vs_9">9mm</dimen>
+    <dimen name="vs_74">74mm</dimen>
+    <dimen name="vs_118">118mm</dimen>
+    <dimen name="vs_292">292mm</dimen>
+    <dimen name="vs_360">360mm</dimen>
+    <dimen name="vs_430">430mm</dimen>
+    <dimen name="vs_520">520mm</dimen>
+    <dimen name="vs_572">572mm</dimen>
+    <dimen name="vs_576">576mm</dimen>
+    <dimen name="vs_648">648mm</dimen>
+    <dimen name="ts_32">32mm</dimen>
+    <dimen name="ts_44">44mm</dimen>
+    <dimen name="vs_54">54mm</dimen>
+    <dimen name="vs_126">126mm</dimen>
+    <dimen name="vs_148">148mm</dimen>
+    <dimen name="vs_278">278mm</dimen>
+    <dimen name="vs_308">308mm</dimen>
+    <dimen name="vs_336">336mm</dimen>
+    <dimen name="vs_348">348mm</dimen>
+    <dimen name="vs_364">364mm</dimen>
+    <dimen name="vs_406">406mm</dimen>
+    <dimen name="vs_422">422mm</dimen>
+    <dimen name="vs_462">462mm</dimen>
+    <dimen name="vs_476">476mm</dimen>
+    <dimen name="vs_508">508mm</dimen>
+    <dimen name="vs_518">518mm</dimen>
+    <dimen name="vs_714">714mm</dimen>
+    <dimen name="vs_916">916mm</dimen>
+    <dimen name="vs_1168">1168mm</dimen>
+    <dimen name="vs_38">38mm</dimen>
+    <dimen name="vs_318">318mm</dimen>
+    <dimen name="vs_402">402mm</dimen>
+    <dimen name="vs_398">398mm</dimen>
+    <dimen name="vs_700">700mm</dimen>
+    <!-- 详情页窗口预览（C 方案）：视频窗 597x336（16:9，与封面等高），
+         开启后信息区让到 x681，宽 543（681+543=1224，与右侧留白 56 对齐） -->
+    <dimen name="vs_597">597mm</dimen>
+    <dimen name="vs_681">681mm</dimen>
+    <dimen name="vs_543">543mm</dimen>
+    <!-- 详情页第二行（线路 / 集数）与动作行，D 方案坐标 -->
+    <dimen name="vs_304">304mm</dimen>
+    <dimen name="vs_310">310mm</dimen>
+    <dimen name="vs_416">416mm</dimen>
+    <!-- 设置页 A 方案：左栏分组导航宽 232 -->
+    <dimen name="vs_232">232mm</dimen>
+    <!-- 配置接口管理弹窗：面板宽 560，条目内小徽标/图标尺寸 -->
+    <dimen name="vs_560">560mm</dimen>
+    <dimen name="ts_11">11mm</dimen>
+    <dimen name="ts_13">13mm</dimen>
 </resources>

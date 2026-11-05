@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 线路胶囊（item_series_flag / 分组共用）：
+     selected 由适配器 setSelected() 驱动（不是焦点），所以 state_selected 放最前面 ——
+     否则"当前线路"和"焦点在哪条"会打架。
+     当前线路 = 暖白实底深色字；焦点 = 描边提亮；其余 = 极淡底。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true" android:state_focused="true">
+        <shape>
+            <corners android:radius="@dimen/vs_20" />
+            <solid android:color="#F4F1EA" />
+            <!-- 焦点落在「当前线路」上时，白底 + 白描边等于没描边，
+                 所以这里用深色内描边把焦点表达出来（2026-11-04 修） -->
+            <stroke
+                android:width="2mm"
+                android:color="#660B0C0F" />
+        </shape>
+    </item>
+    <item android:state_selected="true">
+        <shape>
+            <corners android:radius="@dimen/vs_20" />
+            <solid android:color="#F4F1EA" />
+        </shape>
+    </item>
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="@dimen/vs_20" />
+            <solid android:color="#24F4F1EA" />
+            <stroke
+                android:width="2mm"
+                android:color="@color/ui_accent" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="@dimen/vs_20" />
+            <solid android:color="#0BFFFFFF" />
+            <stroke
+                android:width="1mm"
+                android:color="#1AFFFFFF" />
+        </shape>
+    </item>
+</selector>

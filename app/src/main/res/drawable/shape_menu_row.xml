@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 菜单行：焦点翻暖白实底 + 深色字（文字色由 selector 的 color 版本负责） -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="#F4F1EA" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape>
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="#2EF4F1EA" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+</selector>

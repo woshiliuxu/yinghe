@@ -1,29 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 弹窗行/按钮（2026-11-05 第二版：亮面板反色焦点）。
+     面板已是暖白，常态=无底透明（行与面板同色），聚焦翻深色实底。
+     行内文字必须用 @color/dialog_row_text：常态深字、聚焦翻浅字，
+     否则深底深字（亮面板时代的新坑）。 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_focused="true" android:state_pressed="true">
-        <shape>
-            <corners android:radius="@dimen/vs_5" />
-            <solid android:color="?attr/color_theme_dark_70" />
-        </shape>
-    </item>
-    <item android:state_focused="false" android:state_pressed="true">
-        <shape>
-            <corners android:radius="@dimen/vs_5" />
-            <solid android:color="?attr/color_theme_dark_70" />
-        </shape>
-    </item>
     <item android:state_focused="true">
         <shape>
-            <corners android:radius="@dimen/vs_5" />
-            <solid android:color="?attr/color_theme_dark_70" />
-	    <!--添加选中外边框-->
-	    <stroke android:width="2mm" android:color="@android:color/white" />
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="#14161A" />
         </shape>
     </item>
-    <item android:state_focused="false" android:state_pressed="false">
+    <item android:state_pressed="true">
         <shape>
-            <corners android:radius="@dimen/vs_5" />
-            <solid android:color="@color/color_000000_60" />
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="#2E14161A" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="#0A14161A" />
         </shape>
     </item>
 </selector>

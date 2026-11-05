@@ -12,6 +12,6 @@
     android:gravity="center"
     android:padding="@dimen/vs_10"
     android:text="@{name}"
-    android:textColor="@color/color_FFFFFF"
+    android:textColor="@color/dialog_row_text"
     android:textSize="@dimen/ts_24"
     tools:text="Source Name" />

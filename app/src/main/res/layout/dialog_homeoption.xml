@@ -29,7 +29,7 @@
             android:shadowRadius="5"
             android:singleLine="true"
             android:text="@string/dia_hm_icon"
-            android:textColor="@color/color_FFFFFF"
+            android:textColor="@color/dialog_text_main"
             android:textSize="@dimen/ts_26"
             android:textStyle="bold"
             tools:text="@string/dia_hm_icon" />
@@ -54,8 +54,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:duplicateParentState="true"
                 android:text="@string/hm_search"
-                android:textColor="@android:color/white"
+                android:textColor="@color/dialog_row_text"
                 android:textSize="@dimen/ts_24" />
 
             <TextView
@@ -67,7 +68,8 @@
                 android:id="@+id/tvHomeSearch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
+                android:duplicateParentState="true"
+                android:textColor="@color/dialog_row_text"
                 android:textSize="@dimen/ts_24" />
 
             <TextView
@@ -75,8 +77,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/vs_10"
                 android:layout_marginLeft="@dimen/vs_10"
+                android:duplicateParentState="true"
                 android:text=">"
-                android:textColor="@android:color/white"
+                android:textColor="@color/dialog_row_text"
                 android:textSize="@dimen/ts_24" />
         </LinearLayout>
 
@@ -100,8 +103,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:duplicateParentState="true"
                 android:text="@string/hm_setting"
-                android:textColor="@android:color/white"
+                android:textColor="@color/dialog_row_text"
                 android:textSize="@dimen/ts_24" />
 
             <TextView
@@ -113,7 +117,8 @@
                 android:id="@+id/tvHomeMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
+                android:duplicateParentState="true"
+                android:textColor="@color/dialog_row_text"
                 android:textSize="@dimen/ts_24" />
 
             <TextView
@@ -121,8 +126,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/vs_10"
                 android:layout_marginLeft="@dimen/vs_10"
+                android:duplicateParentState="true"
                 android:text=">"
-                android:textColor="@android:color/white"
+                android:textColor="@color/dialog_row_text"
                 android:textSize="@dimen/ts_24" />
         </LinearLayout>
 

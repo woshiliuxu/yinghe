@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 配置接口条目：地址 + 使用中标记 + 删除按钮。
+     行根布局拿焦点（bg 翻暖白），文字必须 duplicateParentState 跟着翻深色；
+     删除按钮独立拿焦点，图标 tint 用选择器避免白底白图标。 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/vs_50"
+    android:background="@drawable/button_dialog_main"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/vs_16"
+    android:paddingRight="@dimen/vs_8">
+
+    <TextView
+        android:id="@+id/tvConfigName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:duplicateParentState="true"
+        android:ellipsize="middle"
+        android:maxLines="1"
+        android:textColor="@color/dialog_row_text"
+        android:textSize="@dimen/ts_13" />
+
+    <TextView
+        android:id="@+id/tvConfigBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/vs_10"
+        android:background="@drawable/shape_config_badge"
+        android:duplicateParentState="true"
+        android:paddingLeft="@dimen/vs_8"
+        android:paddingTop="@dimen/vs_2"
+        android:paddingRight="@dimen/vs_8"
+        android:paddingBottom="@dimen/vs_2"
+        android:text="@string/dia_config_in_use"
+        android:textColor="@color/dialog_row_text"
+        android:textSize="@dimen/ts_11" />
+
+    <ImageView
+        android:id="@+id/btnConfigDel"
+        android:layout_width="@dimen/vs_36"
+        android:layout_height="@dimen/vs_36"
+        android:layout_marginLeft="@dimen/vs_8"
+        android:background="@drawable/button_dialog_main"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="@dimen/vs_8"
+        android:src="@drawable/icon_delete"
+        android:tint="@color/dialog_row_text" />
+</LinearLayout>

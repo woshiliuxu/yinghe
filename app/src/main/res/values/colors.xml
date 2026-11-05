@@ -3,14 +3,39 @@
     <color name="color_FFB800">#FF6600</color>
 
     <!-- Main Theme E50914 D81F26 -->
-    <color name="color_theme">#F80000</color>
-    <color name="color_theme_80">#CCF80000</color>
-    <color name="color_theme_70">#B3F80000</color>
-    <color name="color_theme_60">#99F80000</color>
-    <color name="color_theme_50">#80F80000</color>
-    <color name="color_theme_40">#66F80000</color>
+    <color name="color_theme">#F4F1EA</color>
+    <color name="color_theme_80">#CCF4F1EA</color>
+    <color name="color_theme_70">#B3F4F1EA</color>
+    <color name="color_theme_60">#99F4F1EA</color>
+    <color name="color_theme_50">#80F4F1EA</color>
+    <color name="color_theme_40">#66F4F1EA</color>
     <!-- Main Dialog Button BG -->
-    <color name="color_theme_dark_70">#B3601216</color>
+    <color name="color_theme_dark_70">#CC1E2027</color>
+
+    <!-- ===== 2026 重设计令牌 · 苹果玻璃风 =====
+         Android 没有 CSS 的 backdrop-filter，玻璃感靠三层叠出来：
+         ① 底图：焦点海报先缩到 128px 再模糊后铺满（Glide 加载 + box blur）
+         ② 玻璃面：12% 白渐变 + 1px 白色高光描边
+         ③ 压暗：顶部/底部各一层渐变，保证文字在任何海报上都读得清
+         主色取纯白，只在焦点态出现，其余一律走灰度。 -->
+    <color name="ui_bg">#07080A</color>
+    <color name="ui_glass_top">#1FFFFFFF</color>
+    <color name="ui_glass_bottom">#08FFFFFF</color>
+    <color name="ui_glass_border">#2BFFFFFF</color>
+    <color name="ui_glass_hi">#3DFFFFFF</color>
+    <color name="ui_fill">#1FFFFFFF</color>
+    <color name="ui_fill_strong">#2EFFFFFF</color>
+    <color name="ui_surface">#14161B</color>
+    <color name="ui_surface_2">#1C1F26</color>
+    <color name="ui_surface_3">#262A33</color>
+    <color name="ui_stroke">#1FFFFFFF</color>
+    <color name="ui_stroke_strong">#33FFFFFF</color>
+    <color name="ui_text_1">#F4F1EA</color>
+    <color name="ui_text_2">#A9ACB4</color>
+    <color name="ui_text_3">#7E818A</color>
+    <color name="ui_accent">#F4F1EA</color>
+    <color name="ui_accent_soft">#3DF4F1EA</color>
+    <color name="ui_on_accent">#0B0C0F</color>
 
     <!-- EPG Colors -->
     <color name="color_32364E">#32364E</color>
@@ -37,6 +62,12 @@
     <color name="color_FFFFFF_40">#66FFFFFF</color>
     <color name="color_FFFFFF_20">#32FFFFFF</color>
     <color name="color_FFFFFF_15">#26FFFFFF</color>
+
+    <!-- 弹窗亮面板（2026-11-05 二次翻新：投影对比度差，深玻璃不可读，
+         全弹窗改暖白纸面 + 深色字；焦点行反色深底白字） -->
+    <color name="dialog_text_main">#D914161A</color>
+    <color name="dialog_text_sub">#8C14161A</color>
+    <color name="dialog_hint">#5C14161A</color>
 
     <color name="transparent">#00000000</color>
     <color name="color_FF000000">#FF000000</color>

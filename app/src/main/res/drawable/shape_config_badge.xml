@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 「使用中」徽标（亮面板版）：常态深色描边胶囊，
+     行聚焦（深底）时翻浅描边，保证两种状态都可读。
+     需配合 duplicateParentState 拿行状态。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="@dimen/vs_8" />
+            <solid android:color="#00F4F1EA" />
+            <stroke android:width="1mm" android:color="#99F4F1EA" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape>
+            <corners android:radius="@dimen/vs_8" />
+            <solid android:color="#00F4F1EA" />
+            <stroke android:width="1mm" android:color="#99F4F1EA" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="@dimen/vs_8" />
+            <solid android:color="#00F4F1EA" />
+            <stroke android:width="1mm" android:color="#6614161A" />
+        </shape>
+    </item>
+</selector>

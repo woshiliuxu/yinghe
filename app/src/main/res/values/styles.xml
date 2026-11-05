@@ -7,6 +7,16 @@
         <item name="colorAccent">?attr/color_theme</item>
     </style>
 
+    <!-- 启动页主题：windowBackground 直接给「启动视觉」（底色+圆+图标），
+         点图标的瞬间 starting window 就有画面 —— Application.onCreate 那 2~3 秒
+         用户看到的是 logo，不再是纯黑。 -->
+    <style name="SplashTheme" parent="@android:style/Theme.NoTitleBar.Fullscreen">
+        <item name="android:windowBackground">@drawable/splash_window</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
@@ -19,78 +29,82 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
-    <!-- Alternative Themes -->
+    <!-- 2026 重设计：统一为琥珀金主色。
+         原版本有 7 套配色（红/蓝/深蓝/橙/黄/洋红/粉），切换后 UI 观感不统一，
+         且都不适配投影仪的低对比度环境。这里全部收敛到同一套，
+         保证无论用户此前存了哪个主题索引，重装后都是同一套观感。 -->
     <style name="NetfxTheme" parent="AppTheme.NoActionBar">
-        <item name="color_theme">#D81F26</item>
-        <item name="color_theme_80">#CCD81F26</item>
-        <item name="color_theme_70">#B3D81F26</item>
-        <item name="color_theme_60">#99D81F26</item>
-        <item name="color_theme_50">#80D81F26</item>
-        <item name="color_theme_40">#66D81F26</item>
-        <item name="color_theme_dark_70">#B38C1418</item>
+        <item name="color_theme">#F4F1EA</item>
+        <item name="color_theme_80">#CCF4F1EA</item>
+        <item name="color_theme_70">#B3F4F1EA</item>
+        <item name="color_theme_60">#99F4F1EA</item>
+        <item name="color_theme_50">#80F4F1EA</item>
+        <item name="color_theme_40">#66F4F1EA</item>
+        <item name="color_theme_dark_70">#CC1E2027</item>
     </style>
     <style name="DoraeTheme" parent="AppTheme.NoActionBar">
-        <item name="color_theme">#18A2E7</item>
-        <item name="color_theme_80">#CC18A2E7</item>
-        <item name="color_theme_70">#B318A2E7</item>
-        <item name="color_theme_60">#9918A2E7</item>
-        <item name="color_theme_50">#8018A2E7</item>
-        <item name="color_theme_40">#6618A2E7</item>
-        <item name="color_theme_dark_70">#B3106D9C</item>
+        <item name="color_theme">#F4F1EA</item>
+        <item name="color_theme_80">#CCF4F1EA</item>
+        <item name="color_theme_70">#B3F4F1EA</item>
+        <item name="color_theme_60">#99F4F1EA</item>
+        <item name="color_theme_50">#80F4F1EA</item>
+        <item name="color_theme_40">#66F4F1EA</item>
+        <item name="color_theme_dark_70">#CC1E2027</item>
     </style>
     <style name="PepsiTheme" parent="AppTheme.NoActionBar">
-        <item name="color_theme">#004B93</item>
-        <item name="color_theme_80">#CC004B93</item>
-        <item name="color_theme_70">#B3004B93</item>
-        <item name="color_theme_60">#99004B93</item>
-        <item name="color_theme_50">#80004B93</item>
-        <item name="color_theme_40">#66004B93</item>
-        <item name="color_theme_dark_70">#B3002547</item>
+        <item name="color_theme">#F4F1EA</item>
+        <item name="color_theme_80">#CCF4F1EA</item>
+        <item name="color_theme_70">#B3F4F1EA</item>
+        <item name="color_theme_60">#99F4F1EA</item>
+        <item name="color_theme_50">#80F4F1EA</item>
+        <item name="color_theme_40">#66F4F1EA</item>
+        <item name="color_theme_dark_70">#CC1E2027</item>
     </style>
     <style name="NarutoTheme" parent="AppTheme.NoActionBar">
-        <item name="color_theme">#FF7439</item>
-        <item name="color_theme_80">#CCFF7439</item>
-        <item name="color_theme_70">#B3FF7439</item>
-        <item name="color_theme_60">#99FF7439</item>
-        <item name="color_theme_50">#80FF7439</item>
-        <item name="color_theme_40">#66FF7439</item>
-        <item name="color_theme_dark_70">#B3B35127</item>
+        <item name="color_theme">#F4F1EA</item>
+        <item name="color_theme_80">#CCF4F1EA</item>
+        <item name="color_theme_70">#B3F4F1EA</item>
+        <item name="color_theme_60">#99F4F1EA</item>
+        <item name="color_theme_50">#80F4F1EA</item>
+        <item name="color_theme_40">#66F4F1EA</item>
+        <item name="color_theme_dark_70">#CC1E2027</item>
     </style>
     <style name="MinionTheme" parent="AppTheme.NoActionBar">
-        <item name="color_theme">#FFD55E</item>
-        <item name="color_theme_80">#CCFFD55E</item>
-        <item name="color_theme_70">#B3FFD55E</item>
-        <item name="color_theme_60">#99FFD55E</item>
-        <item name="color_theme_50">#80FFD55E</item>
-        <item name="color_theme_40">#66FFD55E</item>
-        <item name="color_theme_dark_70">#B3B39542</item>
+        <item name="color_theme">#F4F1EA</item>
+        <item name="color_theme_80">#CCF4F1EA</item>
+        <item name="color_theme_70">#B3F4F1EA</item>
+        <item name="color_theme_60">#99F4F1EA</item>
+        <item name="color_theme_50">#80F4F1EA</item>
+        <item name="color_theme_40">#66F4F1EA</item>
+        <item name="color_theme_dark_70">#CC1E2027</item>
     </style>
     <style name="YagamiTheme" parent="AppTheme.NoActionBar">
-        <item name="color_theme">#FF2F70</item>
-        <item name="color_theme_80">#CCFF2F70</item>
-        <item name="color_theme_70">#B3FF2F70</item>
-        <item name="color_theme_60">#99FF2F70</item>
-        <item name="color_theme_50">#80FF2F70</item>
-        <item name="color_theme_40">#66FF2F70</item>
-        <item name="color_theme_dark_70">#B3B3204E</item>
+        <item name="color_theme">#F4F1EA</item>
+        <item name="color_theme_80">#CCF4F1EA</item>
+        <item name="color_theme_70">#B3F4F1EA</item>
+        <item name="color_theme_60">#99F4F1EA</item>
+        <item name="color_theme_50">#80F4F1EA</item>
+        <item name="color_theme_40">#66F4F1EA</item>
+        <item name="color_theme_dark_70">#CC1E2027</item>
     </style>
     <style name="SakuraTheme" parent="AppTheme.NoActionBar">
-        <item name="color_theme">#FD9BDB</item>
-        <item name="color_theme_80">#CCFD9BDB</item>
-        <item name="color_theme_70">#B3FD9BDB</item>
-        <item name="color_theme_60">#99FD9BDB</item>
-        <item name="color_theme_50">#80FD9BDB</item>
-        <item name="color_theme_40">#66FD9BDB</item>
-        <item name="color_theme_dark_70">#B3B06B98</item>
+        <item name="color_theme">#F4F1EA</item>
+        <item name="color_theme_80">#CCF4F1EA</item>
+        <item name="color_theme_70">#B3F4F1EA</item>
+        <item name="color_theme_60">#99F4F1EA</item>
+        <item name="color_theme_50">#80F4F1EA</item>
+        <item name="color_theme_40">#66F4F1EA</item>
+        <item name="color_theme_dark_70">#CC1E2027</item>
     </style>
 
-    <!-- 自定义dialog样式 -->
+    <!-- 自定义dialog样式（2026-11-05：开启压暗，弹窗玻璃底叠在变暗的内容上更有层次） -->
     <style name="CustomDialogStyle" parent="@android:style/Theme.Dialog">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowFrame">@null</item>
-        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.5</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowFullscreen">true</item>

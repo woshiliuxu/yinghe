@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 启动窗口（starting window）背景：点桌面图标的瞬间系统就会显示它，
+     不用等进程 fork + Application.onCreate + Activity 首帧（低端电视芯片上合计 2~3 秒）。
+     视觉与 SplashActivity 首帧完全一致：#050608 底 + 正中 190 圆 + 96 图标，
+     Activity 起来后无缝接管。item 的 width/height 是 dp（starting window 不走 AutoSize 的 mm）。 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#050608" />
+        </shape>
+    </item>
+    <item
+        android:width="190dp"
+        android:height="190dp"
+        android:drawable="@drawable/shape_splash_circle"
+        android:gravity="center" />
+    <item
+        android:width="96dp"
+        android:height="96dp"
+        android:drawable="@drawable/splash_mark"
+        android:gravity="center" />
+</layer-list>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 线路 / 分组胶囊 · 非当前项：常态极淡底，拿到焦点用主色描边提亮。
+     和 shape_flag_pill_on 配对使用（选中态由适配器按数据切换，不看 selected 状态）。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="@dimen/vs_20" />
+            <solid android:color="#24F4F1EA" />
+            <stroke
+                android:width="2mm"
+                android:color="@color/ui_accent" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="@dimen/vs_20" />
+            <solid android:color="#0BFFFFFF" />
+            <stroke
+                android:width="1mm"
+                android:color="#1AFFFFFF" />
+        </shape>
+    </item>
+</selector>

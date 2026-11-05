@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 弹窗底板（2026-11-05 第二版：亮面板）。
+     投影机对比度差，第一版深玻璃底上浅字实测看不清，
+     全弹窗翻成暖白纸面：常态深色字、焦点行反色深底白字。
+     亮面板自带视觉「抬升」，不需要描边，去 stroke 保持干净。 -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <corners android:radius="@dimen/vs_15" />
-    <solid android:color="@color/color_3D3D3D" />
+    <corners android:radius="@dimen/vs_22" />
+    <solid android:color="#F7F5F1" />
 </shape>

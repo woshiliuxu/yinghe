@@ -78,6 +78,8 @@ public class RemoteServer extends NanoHTTPD {
         getRequestList.add(new RawRequestProcess(this.mContext, "/index.html", R.raw.index, NanoHTTPD.MIME_HTML));
         getRequestList.add(new RawRequestProcess(this.mContext, "/style.css", R.raw.style, "text/css"));
         getRequestList.add(new RawRequestProcess(this.mContext, "/ui.css", R.raw.ui, "text/css"));
+        // 2026-11-05 手机助手页重写：新样式表（WeUI 旧样式弃用，但路由保留兼容旧缓存页面）
+        getRequestList.add(new RawRequestProcess(this.mContext, "/yhg.css", R.raw.yhg, "text/css"));
         getRequestList.add(new RawRequestProcess(this.mContext, "/jquery.js", R.raw.jquery, "application/x-javascript"));
         getRequestList.add(new RawRequestProcess(this.mContext, "/script.js", R.raw.script, "application/x-javascript"));
         getRequestList.add(new RawRequestProcess(this.mContext, "/favicon.ico", R.drawable.app_icon, "image/x-icon"));

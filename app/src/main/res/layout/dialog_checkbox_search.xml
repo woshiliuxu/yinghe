@@ -54,7 +54,7 @@
                     android:focusableInTouchMode="false"
                     android:gravity="center"
                     android:text="@string/search_checkAll"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_20" />
             </LinearLayout>
 
@@ -91,7 +91,7 @@
                     android:focusableInTouchMode="false"
                     android:gravity="center"
                     android:text="@string/search_clearAll"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_20" />
             </LinearLayout>
         </LinearLayout>

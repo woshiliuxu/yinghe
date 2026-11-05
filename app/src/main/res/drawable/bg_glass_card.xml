@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 配置地址卡：玻璃托底，常驻左栏底部 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="#0BFFFFFF" />
+            <stroke android:width="1mm" android:color="#17FFFFFF" />
+        </shape>
+    </item>
+</layer-list>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 元信息行末尾的站点胶囊：比评分胶囊淡一档，用来区分"评分"和"来源"两种信息 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="@dimen/vs_12" />
+    <solid android:color="#17F4F1EA" />
+    <stroke
+        android:width="1mm"
+        android:color="#28F4F1EA" />
+</shape>

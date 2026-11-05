@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 进度条轨道：178×4，圆角 2 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="2mm" />
+    <solid android:color="#2A2C31" />
+</shape>

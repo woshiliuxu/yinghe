@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 启动页正中的圆：直径 190，圆心压在画面正中；填充用主色暖白，与桌面图标同一套色 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/color_theme" />
+</shape>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 左上角品牌标记底：白色渐变方块，内嵌深色播放三角 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="12mm" />
+    <gradient
+        android:angle="315"
+        android:startColor="#FFFFFF"
+        android:endColor="#D7DCE4" />
+</shape>

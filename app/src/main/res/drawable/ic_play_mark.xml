@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 左上角品牌标记：与启动图标同一个记号（细框当"盒"，实心三角当"影"）。
+     深色画在白色渐变方块里。原来这里只有一个播放三角，
+     和新的启动图标对不上，看起来像两套品牌。
+     22px 下框线约 1.4px、三角约 7px，刚好还能分出"框"和"影"两层。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M7,1.8 L17,1.8 A5.2,5.2 0 0 1 22.2,7 L22.2,17 A5.2,5.2 0 0 1 17,22.2 L7,22.2 A5.2,5.2 0 0 1 1.8,17 L1.8,7 A5.2,5.2 0 0 1 7,1.8 Z"
+        android:strokeColor="#0B0C0F"
+        android:strokeWidth="1.7" />
+
+    <path
+        android:fillColor="#0B0C0F"
+        android:pathData="M9.9,7.9 L16.6,11.6 C17,11.8 17,12.2 16.6,12.4 L9.9,16.1 C9.5,16.3 9,16 9,15.6 L9,8.4 C9,8 9.5,7.7 9.9,7.9 Z" />
+</vector>

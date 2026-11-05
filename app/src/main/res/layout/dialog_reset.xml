@@ -23,7 +23,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
             android:text="@string/dia_reset"
-            android:textColor="@color/color_FFFFFF"
+            android:textColor="@color/dialog_text_main"
             android:textSize="24sp"
             android:textStyle="bold"
             tools:text="@string/dia_reset" />
@@ -49,8 +49,8 @@
             android:shadowDy="0"
             android:shadowRadius="5"
             android:text="确定"
-            android:textColor="@color/color_FFFFFF"
-            android:textColorHint="@color/color_FFFFFF_50"
+            android:textColor="@color/dialog_row_text"
+            android:textColorHint="@color/dialog_hint"
             android:textSize="@dimen/ts_20" />
 
         <TextView
@@ -70,8 +70,8 @@
             android:shadowDy="0"
             android:shadowRadius="5"
             android:text="取消"
-            android:textColor="@color/color_FFFFFF"
-            android:textColorHint="@color/color_FFFFFF_50"
+            android:textColor="@color/dialog_row_text"
+            android:textColorHint="@color/dialog_hint"
             android:textSize="@dimen/ts_20" />
 
         </TableRow>

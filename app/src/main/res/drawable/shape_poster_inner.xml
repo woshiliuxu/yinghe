@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 海报卡内层：图片加载完成前露出的底色，避免白闪 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="8mm" />
+    <solid android:color="@color/ui_surface_2" />
+</shape>

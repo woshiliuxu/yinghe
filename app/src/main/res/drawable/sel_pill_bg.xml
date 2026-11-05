@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 分类胶囊的四种状态组合：
+     焦点走白描边，当前分类走主色填充，两者分开表达，互不覆盖。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true" android:state_focused="true" android:drawable="@drawable/shape_pill_active_focus" />
+    <item android:state_focused="true" android:drawable="@drawable/shape_pill_focus" />
+    <item android:state_selected="true" android:drawable="@drawable/shape_pill_active" />
+    <item android:drawable="@drawable/shape_pill_idle" />
+</selector>

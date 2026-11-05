@@ -27,6 +27,7 @@ import com.github.tvbox.osc.ui.dialog.AboutDialog;
 import com.github.tvbox.osc.ui.dialog.ApiDialog;
 import com.github.tvbox.osc.ui.dialog.ApiHistoryDialog;
 import com.github.tvbox.osc.ui.dialog.BackupDialog;
+import com.github.tvbox.osc.ui.dialog.ConfigApiDialog;
 import com.github.tvbox.osc.ui.dialog.HomeIconDialog;
 import com.github.tvbox.osc.ui.dialog.MediaSettingDialog;
 import com.github.tvbox.osc.ui.dialog.ResetDialog;
@@ -34,11 +35,13 @@ import com.github.tvbox.osc.ui.dialog.SelectDialog;
 import com.github.tvbox.osc.ui.dialog.XWalkInitDialog;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
+import com.github.tvbox.osc.util.HawkUtils;
 import com.github.tvbox.osc.util.HistoryHelper;
 import com.github.tvbox.osc.util.OkGoHelper;
 import com.github.tvbox.osc.util.PlayerHelper;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.FileCallback;
+import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Progress;
 import com.lzy.okgo.model.Response;
 import com.orhanobut.hawk.Hawk;
@@ -107,12 +110,16 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvDebugOpen = findViewById(R.id.tvDebugOpen);
         tvDebugOpen.setText(Hawk.get(HawkConfig.DEBUG_OPEN, false) ? "开启" : "关闭");
         tvApi = findViewById(R.id.tvApi);
-        tvApi.setText(Hawk.get(HawkConfig.API_URL, ""));
+        // 没有手动配置过（键不存在）时显示实际生效的内置默认源，而不是空白
+        tvApi.setText(Hawk.get(HawkConfig.API_URL, getString(R.string.app_source)));
         // Home Section
         tvHomeApi = findViewById(R.id.tvHomeApi);
         tvHomeApi.setText(ApiConfig.get().getHomeSourceBean().getName());
         tvHomeShow = findViewById(R.id.tvHomeShow);
         tvHomeShow.setText(Hawk.get(HawkConfig.HOME_SHOW_SOURCE, false) ? "开启" : "关闭");
+        // 按钮位置：搜索 / 菜单两组上下位置，拼成一个值展示
+        tvHomeIcon = findViewById(R.id.tvHomeIcon);
+        tvHomeIcon.setText(getHomeIconText());
         tvHomeRec = findViewById(R.id.tvHomeRec);
         tvHomeRec.setText(getHomeRecName(Hawk.get(HawkConfig.HOME_REC, 0)));
         tvHomeNum = findViewById(R.id.tvHomeNum);
@@ -142,8 +149,9 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvHomeDefaultShow = findViewById(R.id.tvHomeDefaultShow);
         tvHomeDefaultShow.setText(Hawk.get(HawkConfig.HOME_DEFAULT_SHOW, false) ? "开启" : "关闭");
 
-        //takagen99 : Set HomeApi as default
-        findViewById(R.id.llHomeApi).requestFocus();
+        //takagen99 : Set first row as default（首页组首行=配置接口）
+        findViewById(R.id.llApi).requestFocus();
+        setupGroups();
 
         findViewById(R.id.llDebug).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,54 +162,20 @@ public class ModelSettingFragment extends BaseLazyFragment {
             }
         });
         // Input Source URL ------------------------------------------------------------------------
+        // 2026-11-05：配置行迁入首页组首行，点行打开「配置接口」管理弹窗
+        // （影视仓式多配置：切换/删除/新增；切换自动重启生效）
         findViewById(R.id.llApi).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                ApiDialog dialog = new ApiDialog(mActivity);
-                EventBus.getDefault().register(dialog);
-                dialog.setOnListener(new ApiDialog.OnListener() {
-                    @Override
-                    public void onchange(String api) {
-                        Hawk.put(HawkConfig.API_URL, api);
-                        tvApi.setText(api);
-                    }
-                });
+                ConfigApiDialog dialog = new ConfigApiDialog(mActivity);
                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
                         ((BaseActivity) mActivity).hideSystemUI(true);
-                        EventBus.getDefault().unregister(dialog);
+                        tvApi.setText(Hawk.get(HawkConfig.API_URL, getString(R.string.app_source)));
                     }
                 });
-                dialog.show();
-            }
-        });
-        findViewById(R.id.llApiHistory).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
-                if (history.isEmpty())
-                    return;
-                String current = Hawk.get(HawkConfig.API_URL, "");
-                int idx = 0;
-                if (history.contains(current))
-                    idx = history.indexOf(current);
-                ApiHistoryDialog dialog = new ApiHistoryDialog(getContext());
-                dialog.setTip(getString(R.string.dia_history_list));
-                dialog.setAdapter(new ApiHistoryDialogAdapter.SelectDialogInterface() {
-                    @Override
-                    public void click(String api) {
-                        Hawk.put(HawkConfig.API_URL, api);
-                        tvApi.setText(api);
-                        dialog.dismiss();
-                    }
-
-                    @Override
-                    public void del(String value, ArrayList<String> data) {
-                        Hawk.put(HawkConfig.API_HISTORY, data);
-                    }
-                }, history, idx);
                 dialog.show();
             }
         });
@@ -272,6 +246,7 @@ public class ModelSettingFragment extends BaseLazyFragment {
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
                 HomeIconDialog dialog = new HomeIconDialog(mActivity);
+                dialog.setOnDismissListener(dialog1 -> tvHomeIcon.setText(getHomeIconText()));
                 dialog.show();
             }
         });
@@ -488,10 +463,15 @@ public class ModelSettingFragment extends BaseLazyFragment {
 
 
         // Select DECODER Type --------------------------------------------
-        //更改选择是否用硬解码还是软解码 改成播放器设置
+        // 更改选择是否用硬解码还是软解码 改成播放器设置
+        // 2026-11-05：值胶囊原来从没赋过值，一直空着像坏行；现在显示首选策略，弹窗关了再刷新
+        final TextView tvMediaCodec = findViewById(R.id.tvMediaCodec);
+        tvMediaCodec.setText(HawkUtils.getVodPlayerPreferredDesc());
         findViewById(R.id.llMediaSetting).setOnClickListener(view -> {
             FastClickCheckUtil.check(view);
             MediaSettingDialog mediaSettingDialog = new MediaSettingDialog(view.getContext());
+            mediaSettingDialog.setOnDismissListener(dialog ->
+                    tvMediaCodec.setText(HawkUtils.getVodPlayerPreferredDesc()));
             mediaSettingDialog.show();
         });
 
@@ -616,28 +596,16 @@ public class ModelSettingFragment extends BaseLazyFragment {
             }
         });
         // Load Wallpaper from URL -------------------------------------
+        // 2026-11-05 改造：原来这里是下载配置 JSON 里的固定 wallpaper 地址，
+        // 每次按都是同一张，谈不上「换」。现在走必应官方每日壁纸接口
+        // （cn.bing.com，国内直连稳定），从最近 8 天里随机挑一张下载生效；
+        // 接口失败时回退到配置里的 wallpaper 地址。
         findViewById(R.id.llWp).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FastClickCheckUtil.check(v);
-                if (!ApiConfig.get().wallpaper.isEmpty())
-                    Toast.makeText(mContext, getString(R.string.mn_wall_load), Toast.LENGTH_SHORT).show();
-                OkGo.<File>get(ApiConfig.get().wallpaper).execute(new FileCallback(requireActivity().getFilesDir().getAbsolutePath(), "wp") {
-                    @Override
-                    public void onSuccess(Response<File> response) {
-                        ((BaseActivity) requireActivity()).changeWallpaper(true);
-                    }
-
-                    @Override
-                    public void onError(Response<File> response) {
-                        super.onError(response);
-                    }
-
-                    @Override
-                    public void downloadProgress(Progress progress) {
-                        super.downloadProgress(progress);
-                    }
-                });
+                Toast.makeText(mContext, getString(R.string.mn_wall_load), Toast.LENGTH_SHORT).show();
+                fetchRandomWallpaper();
             }
         });
         // Restore Default Wallpaper from system -------------------------
@@ -818,6 +786,143 @@ public class ModelSettingFragment extends BaseLazyFragment {
             }
         };
 
+    }
+
+    /** 「按钮位置」行显示值：搜索 / 菜单两组上下位置拼一起 */
+    private String getHomeIconText() {
+        String search = Hawk.get(HawkConfig.HOME_SEARCH_POSITION, true) ? "搜索上" : "搜索下";
+        String menu = Hawk.get(HawkConfig.HOME_MENU_POSITION, true) ? "菜单上" : "菜单下";
+        return search + " · " + menu;
+    }
+
+    /**
+     * A 方案分组导航（2026-11-05 拍板）：
+     * 左栏三张分组卡（首页 / 播放器 / 系统），右区每次只显示当前组的选项行。
+     * 交互：分组卡「聚焦」即切组（上下扫一遍就能预览各组）；
+     *       「点按」切组并把焦点交给该组第一行；行上按左键由 nextFocusLeft 回到本组卡片。
+     */
+    private void setupGroups() {
+        final TextView tvGroupTitle = findViewById(R.id.tvGroupTitle);
+        final TextView tvGroupDesc = findViewById(R.id.tvGroupDesc);
+        final int[] cards = {R.id.groupHome, R.id.groupPlayer, R.id.groupSystem};
+        final int[] groups = {R.id.llGroupHome, R.id.llGroupPlayer, R.id.llGroupSystem};
+        final int[] firstRows = {R.id.llApi, R.id.llScale, R.id.llLocale};
+        final String[] titles = {
+                getString(R.string.act_home), getString(R.string.act_player), getString(R.string.act_system)};
+        final String[] descs = {
+                "开机直接进首页的推荐内容", "画面、声音与播放行为", "外观、数据与关于"};
+
+        for (int i = 0; i < cards.length; i++) {
+            final int idx = i;
+            View card = findViewById(cards[i]);
+            // 初始态：首页组为当前组（android:activated 不是合法 XML 属性，只能代码设）
+            card.setActivated(idx == 0);
+            card.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (hasFocus) switchGroup(cards, groups, idx, tvGroupTitle, titles[idx], tvGroupDesc, descs[idx]);
+                }
+            });
+            card.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switchGroup(cards, groups, idx, tvGroupTitle, titles[idx], tvGroupDesc, descs[idx]);
+                    findViewById(firstRows[idx]).requestFocus();
+                }
+            });
+        }
+    }
+
+    /** 切组：只留一个容器可见，标题行同步；卡片 activated 做「当前组」标记（背景/图标/文字三态联动） */
+    private void switchGroup(int[] cards, int[] groups, int idx, TextView title, String t, TextView desc, String d) {
+        for (int j = 0; j < groups.length; j++) {
+            findViewById(groups[j]).setVisibility(j == idx ? View.VISIBLE : View.GONE);
+            findViewById(cards[j]).setActivated(j == idx);
+        }
+        title.setText(t);
+        desc.setText(d);
+    }
+
+    /** 必应官方每日壁纸接口：国内直连稳定，idx=0&n=8 返回最近 8 天 */
+    private static final String BING_WP_API = "https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&mkt=zh-CN";
+
+    /**
+     * 随机换壁纸：先从必应接口拿最近 8 天的图，随机挑一张下载到 filesDir/wp，
+     * changeWallpaper(true) 让窗口背景立即生效。接口挂了走 fallbackWallpaper()。
+     */
+    private void fetchRandomWallpaper() {
+        OkGo.<String>get(BING_WP_API).tag("bing_wallpaper").execute(new StringCallback() {
+            @Override
+            public void onSuccess(com.lzy.okgo.model.Response<String> response) {
+                String url = pickBingImage(response.body());
+                if (url == null) {
+                    fallbackWallpaper();
+                    return;
+                }
+                downloadWallpaper("https://cn.bing.com" + url);
+            }
+
+            @Override
+            public void onError(com.lzy.okgo.model.Response<String> response) {
+                fallbackWallpaper();
+            }
+        });
+    }
+
+    /**
+     * 解析必应接口返回的 JSON，随机挑一张没换过的。
+     * 把选中的 enddate 存起来，连按「换张壁纸」时尽量不重复（8 张都换过一轮后才会重来）。
+     */
+    private String pickBingImage(String json) {
+        try {
+            org.json.JSONObject obj = new org.json.JSONObject(json);
+            org.json.JSONArray images = obj.getJSONArray("images");
+            if (images.length() == 0) return null;
+            java.util.Random random = new java.util.Random();
+            String last = Hawk.get(HawkConfig.BING_WP_LAST, "");
+            // 最多重抽 4 次，避开上一张；8 张的池子重抽 4 次撞上旧图的概率很低
+            for (int i = 0; i < 4; i++) {
+                org.json.JSONObject img = images.getJSONObject(random.nextInt(images.length()));
+                String url = img.optString("url", "");
+                String date = img.optString("enddate", "");
+                if (!url.isEmpty() && !date.equals(last)) {
+                    Hawk.put(HawkConfig.BING_WP_LAST, date);
+                    return url;
+                }
+            }
+            // 重抽全撞了就随便拿一张兜底
+            org.json.JSONObject img = images.getJSONObject(random.nextInt(images.length()));
+            String url = img.optString("url", "");
+            if (!url.isEmpty()) Hawk.put(HawkConfig.BING_WP_LAST, img.optString("enddate", ""));
+            return url.isEmpty() ? null : url;
+        } catch (Throwable th) {
+            th.printStackTrace();
+            return null;
+        }
+    }
+
+    /** 下载壁纸到 filesDir/wp（changeWallpaper 读的就是这个文件），完成后立即生效 */
+    private void downloadWallpaper(String url) {
+        OkGo.<File>get(url).tag("bing_wallpaper").execute(new FileCallback(requireActivity().getFilesDir().getAbsolutePath(), "wp") {
+            @Override
+            public void onSuccess(com.lzy.okgo.model.Response<File> response) {
+                ((BaseActivity) requireActivity()).changeWallpaper(true);
+            }
+
+            @Override
+            public void onError(com.lzy.okgo.model.Response<File> response) {
+                Toast.makeText(mContext, getString(R.string.mn_wall_fail), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /** 必应接口挂了就回退老逻辑：下载配置 JSON 里指定的 wallpaper 地址 */
+    private void fallbackWallpaper() {
+        if (ApiConfig.get().wallpaper.isEmpty()) {
+            Toast.makeText(mContext, getString(R.string.mn_wall_fail), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        downloadWallpaper(ApiConfig.get().wallpaper);
     }
 
     @Override

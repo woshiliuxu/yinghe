@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 海报底部压暗层：压住图片下缘，保证片名在任何海报上都能读。
+     底部两角跟随图片圆角，否则方形遮罩会在圆角处露角。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners
+        android:bottomLeftRadius="8mm"
+        android:bottomRightRadius="8mm" />
+    <gradient
+        android:angle="270"
+        android:endColor="#E6000000"
+        android:startColor="#00000000"
+        android:type="linear" />
+</shape>

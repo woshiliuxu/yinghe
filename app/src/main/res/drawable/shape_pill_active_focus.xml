@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 分类胶囊 · 当前分类 + 拿到焦点：
+     底仍是暖白实底（保住"当前分类"的识别），焦点改用**深色内描边**表达。
+     原来这里只比常态亮 3 个色阶（#F7F8FA vs #F4F1EA），焦点落在当前分类上
+     肉眼几乎看不出区别 —— 2026-11-04 修掉。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="12mm" />
+    <solid android:color="#F4F1EA" />
+    <stroke
+        android:width="2mm"
+        android:color="#660B0C0F" />
+</shape>

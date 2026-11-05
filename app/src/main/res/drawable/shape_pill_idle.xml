@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 分类胶囊 · 常态：极淡白底 + 1px 描边 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="12mm" />
+    <solid android:color="#14FFFFFF" />
+    <stroke
+        android:width="1mm"
+        android:color="#1AFFFFFF" />
+</shape>

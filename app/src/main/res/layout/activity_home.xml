@@ -1,33 +1,232 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 首页顶部栏 -->
+<!-- 首页（2026 重设计 · 方案 A：左侧导航 + 类型胶囊 + 海报墙）
+     结构：左侧竖向导航栏 / 顶部源名与时间 / 内容类型胶囊 / 海报墙 / 底部焦点信息条。
+     尺寸沿用工程原有的 mm 刻度（数值即 1280x720 设计稿像素）。 -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/ui_bg">
+
+    <!-- 背景：焦点海报缩到 128px 再高斯模糊、centerCrop 铺满。
+         这是整套玻璃质感的基底——上面所有面板都只是半透明白。 -->
+    <ImageView
+        android:id="@+id/bgBlur"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:scaleType="centerCrop" />
+
+    <View
+        android:id="@+id/bgScrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/scrim_backdrop" />
+
+    <!-- 左栏：上下 padding 故意不等。
+         视觉空隙统一是 20（logo 白块上缘距顶边 20 / wifi 图标下缘距底边 20）。
+         logo 是满壳实色块，边缘即视觉边缘，所以 paddingTop = 20；
+         wifi 是 50 的壳里只露 22 的图标，图标已内缩 14，外壳只要再让 6，加起来才是 20。
+         别把这两个数"统一"成同一个值，那会让底部图标掉下去 14mm。 -->
+    <!-- 左栏：条目宽度 = match_parent，永远跟着 leftRail 的 76 走。
+         **不要**再给条目写死 176：容器 clipChildren=true，写死 176 会被裁在 76 里，
+         选中胶囊就变成「左圆右方」（2026-11-04 修掉的 bug）。
+         左栏已改成纯图标、不展开，所以条目宽度不需要比容器宽。
+         paddingStart 13 = (76 − 50) / 2，保证图标在 76 宽里居中。
+
+         中间五项，首页压正中（第 3 位）—— 它是"回推荐首页"的中枢，
+         放中间是为了不用先判断该往上还是往下找。设置类入口全部沉到最下面的「个人」。 -->
+
+    <LinearLayout
+        android:id="@+id/leftRail"
+        android:layout_width="@dimen/vs_76"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/vs_20"
+        android:layout_marginLeft="@dimen/vs_20"
+        android:layout_marginTop="@dimen/vs_20"
+        android:layout_marginBottom="@dimen/vs_20"
+        android:clipChildren="true"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/vs_0"
+        android:paddingBottom="@dimen/vs_20"
+        android:translationZ="3mm"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="@dimen/vs_76"
+            android:layout_height="@dimen/vs_50"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="@dimen/vs_50"
+                android:layout_height="@dimen/vs_50"
+                android:background="@drawable/shape_logo_mark"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="@dimen/vs_22"
+                    android:layout_height="@dimen/vs_22"
+                    android:src="@drawable/ic_play_mark" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:id="@+id/tvFind"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/vs_44"
+            android:background="@drawable/sel_rail_btn"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:nextFocusUp="@id/tvFind"
+            android:paddingStart="@dimen/vs_13"
+            android:paddingLeft="@dimen/vs_13">
+
+            <ImageView
+                android:layout_width="@dimen/vs_50"
+                android:layout_height="@dimen/vs_50"
+                android:duplicateParentState="true"
+                android:padding="@dimen/vs_14"
+                android:src="@drawable/hm_search"
+                android:tint="@color/rail_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tvHistory"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/vs_44"
+            android:background="@drawable/sel_rail_btn"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/vs_13"
+            android:paddingLeft="@dimen/vs_13">
+
+            <ImageView
+                android:layout_width="@dimen/vs_50"
+                android:layout_height="@dimen/vs_50"
+                android:duplicateParentState="true"
+                android:padding="@dimen/vs_14"
+                android:src="@drawable/hm_history"
+                android:tint="@color/rail_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tvHome"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/vs_44"
+            android:background="@drawable/sel_rail_btn"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/vs_13"
+            android:paddingLeft="@dimen/vs_13">
+
+            <ImageView
+                android:layout_width="@dimen/vs_50"
+                android:layout_height="@dimen/vs_50"
+                android:duplicateParentState="true"
+                android:padding="@dimen/vs_14"
+                android:src="@drawable/hm_home"
+                android:tint="@color/rail_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tvFav"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/vs_44"
+            android:background="@drawable/sel_rail_btn"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/vs_13"
+            android:paddingLeft="@dimen/vs_13">
+
+            <ImageView
+                android:layout_width="@dimen/vs_50"
+                android:layout_height="@dimen/vs_50"
+                android:duplicateParentState="true"
+                android:padding="@dimen/vs_14"
+                android:src="@drawable/hm_fav"
+                android:tint="@color/rail_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tvPush"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/vs_44"
+            android:background="@drawable/sel_rail_btn"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/vs_13"
+            android:paddingLeft="@dimen/vs_13">
+
+            <ImageView
+                android:layout_width="@dimen/vs_50"
+                android:layout_height="@dimen/vs_50"
+                android:duplicateParentState="true"
+                android:padding="@dimen/vs_14"
+                android:src="@drawable/hm_push"
+                android:tint="@color/rail_content" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:id="@+id/tvPerson"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/vs_44"
+            android:background="@drawable/sel_rail_btn"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:nextFocusDown="@id/tvPerson"
+            android:paddingStart="@dimen/vs_13"
+            android:paddingLeft="@dimen/vs_13">
+
+            <ImageView
+                android:layout_width="@dimen/vs_50"
+                android:layout_height="@dimen/vs_50"
+                android:duplicateParentState="true"
+                android:padding="@dimen/vs_14"
+                android:src="@drawable/hm_person"
+                android:tint="@color/rail_content" />
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/topLayout"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/vs_0"
         android:layout_height="@dimen/vs_50"
+        android:layout_marginStart="@dimen/vs_136"
+        android:layout_marginLeft="@dimen/vs_136"
         android:layout_marginTop="@dimen/vs_20"
+        android:layout_marginEnd="@dimen/vs_40"
+        android:layout_marginRight="@dimen/vs_40"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingLeft="@dimen/vs_50"
-        android:paddingRight="@dimen/vs_50"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
-        <View
-            android:layout_width="@dimen/vs_5"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/vs_8"
-            android:layout_marginEnd="@dimen/vs_12"
-            android:layout_marginRight="@dimen/vs_12"
-            android:layout_marginBottom="@dimen/vs_8"
-            android:background="?attr/color_theme" />
 
         <TextView
             android:id="@+id/tvName"
@@ -36,105 +235,48 @@
             android:layout_weight="1"
             android:clickable="true"
             android:ellipsize="marquee"
-            android:focusable="true"
+            android:focusable="false"
             android:focusableInTouchMode="false"
             android:gravity="left|center_vertical"
-            android:nextFocusRight="@id/tvWifi"
+            android:nextFocusRight="@id/tvSrc"
             android:nextFocusDown="@id/mGridViewCategory"
             android:singleLine="true"
             android:text="@string/app_name"
             android:textAlignment="gravity"
-            android:textColor="@color/font_home_selector"
-            android:background="@drawable/shape_toplayout_tvname"
-            android:textSize="@dimen/ts_30"
-            android:textStyle="bold" />
+            android:textColor="@color/ui_text_1"
+            android:textSize="@dimen/ts_30" />
 
-        <ImageView
-            android:id="@+id/tvWifi"
-            android:layout_width="@dimen/vs_50"
-            android:layout_height="@dimen/vs_50"
-            android:layout_marginStart="@dimen/vs_15"
-            android:layout_marginLeft="@dimen/vs_15"
-            android:layout_marginEnd="@dimen/vs_15"
-            android:layout_marginRight="@dimen/vs_15"
-            android:background="@drawable/button_dialog_vod"
-            android:clickable="true"
-            android:focusable="true"
-            android:nextFocusLeft="@id/tvName"
-            android:padding="@dimen/vs_5"
-            android:src="@drawable/hm_wifi_no" />
-
-        <ImageView
-            android:id="@+id/tvFind"
-            android:layout_width="@dimen/vs_50"
-            android:layout_height="@dimen/vs_50"
-            android:layout_marginStart="@dimen/vs_15"
-            android:layout_marginLeft="@dimen/vs_15"
-            android:layout_marginEnd="@dimen/vs_15"
-            android:layout_marginRight="@dimen/vs_15"
-            android:background="@drawable/button_dialog_vod"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="@dimen/vs_5"
-            android:src="@drawable/hm_search" />
-
-        <ImageView
-            android:id="@+id/tvStyle"
-            android:layout_width="@dimen/vs_50"
-            android:layout_height="@dimen/vs_50"
-            android:layout_marginStart="@dimen/vs_15"
-            android:layout_marginLeft="@dimen/vs_15"
-            android:layout_marginEnd="@dimen/vs_15"
-            android:layout_marginRight="@dimen/vs_15"
-            android:background="@drawable/button_dialog_vod"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="@dimen/vs_10"
-            android:src="@drawable/hm_left_right" />
-
-        <ImageView
-            android:id="@+id/tvDrawer"
-            android:layout_width="@dimen/vs_50"
-            android:layout_height="@dimen/vs_50"
-            android:layout_marginStart="@dimen/vs_15"
-            android:layout_marginLeft="@dimen/vs_15"
-            android:layout_marginEnd="@dimen/vs_15"
-            android:layout_marginRight="@dimen/vs_15"
-            android:background="@drawable/button_dialog_vod"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="@dimen/vs_5"
-            android:src="@drawable/hm_drawer" />
-
-        <ImageView
-            android:id="@+id/tvMenu"
-            android:layout_width="@dimen/vs_50"
-            android:layout_height="@dimen/vs_50"
-            android:layout_marginStart="@dimen/vs_15"
-            android:layout_marginLeft="@dimen/vs_15"
-            android:layout_marginEnd="@dimen/vs_15"
-            android:layout_marginRight="@dimen/vs_15"
-            android:background="@drawable/button_dialog_vod"
-            android:clickable="true"
-            android:focusable="true"
-            android:nextFocusDown="@id/tvDrive"
-            android:padding="@dimen/vs_5"
-            android:src="@drawable/hm_settings" />
+        <TextView
+            android:id="@+id/tvSrc"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/vs_20"
+            android:layout_marginLeft="@dimen/vs_20"
+            android:layout_marginEnd="@dimen/vs_20"
+            android:layout_marginRight="@dimen/vs_20"
+            android:ellipsize="end"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:gravity="right|center_vertical"
+            android:maxWidth="@dimen/vs_240"
+            android:singleLine="true"
+            android:textColor="@color/ui_text_3"
+            android:textSize="@dimen/ts_20"
+            tools:text="盒子迷MAX" />
 
         <TextView
             android:id="@+id/tvDate"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginStart="@dimen/vs_15"
-            android:layout_marginLeft="@dimen/vs_15"
+            android:layout_marginStart="@dimen/vs_20"
+            android:layout_marginLeft="@dimen/vs_20"
             android:focusable="false"
             android:focusableInTouchMode="false"
             android:gravity="right|center_vertical"
             android:textAlignment="gravity"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/ts_22"
-            android:textStyle="bold"
-            tools:text="DateTime" />
+            android:textColor="@color/ui_text_3"
+            android:textSize="@dimen/ts_20"
+            tools:text="11-04 周三 16:30" />
 
     </LinearLayout>
 
@@ -142,22 +284,26 @@
         android:id="@+id/contentLayout"
         android:layout_width="@dimen/vs_0"
         android:layout_height="@dimen/vs_0"
+        android:layout_marginStart="@dimen/vs_128"
+        android:layout_marginLeft="@dimen/vs_128"
+        android:layout_marginEnd="@dimen/vs_32"
+        android:layout_marginRight="@dimen/vs_32"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topLayout">
+        app:layout_constraintTop_toBottomOf="@id/topLayout">
 
         <com.owen.tvrecyclerview.widget.TvRecyclerView
             android:id="@+id/mGridViewCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/vs_10"
-            android:layout_marginBottom="@dimen/vs_10"
-            android:paddingLeft="@dimen/vs_50"
-            android:paddingRight="@dimen/vs_50"
+            android:layout_marginBottom="@dimen/vs_6"
+            android:paddingLeft="@dimen/vs_8"
+            android:paddingRight="@dimen/vs_8"
             app:tv_selectedItemIsCentered="true" />
 
         <com.github.tvbox.osc.ui.tv.widget.NoScrollViewPager
@@ -165,4 +311,5 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

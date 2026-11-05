@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 弹窗行文字（2026-11-05 第二版：亮面板）。
+     行底=button_dialog_main：常态暖白面板上的深字，
+     聚焦/按下翻深底时文字转浅色。
+     焦点在父容器上的行，子元素还需 duplicateParentState="true"。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true" android:color="#F4F1EA" />
+    <item android:state_pressed="true" android:color="#F4F1EA" />
+    <item android:color="@color/dialog_text_main" />
+</selector>

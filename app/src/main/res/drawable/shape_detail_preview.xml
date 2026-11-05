@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 详情页窗口预览外框（C 方案 597x336）：
+     播放器本体是 SurfaceView，圆角裁不动，所以圆角只做在描边上——
+     四角能看到一圈 1px 亮边，视频画面四角是直的，观感上跟"播放器窗口"一致。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="@dimen/vs_8" />
+    <stroke
+        android:width="1mm"
+        android:color="#12FFFFFF" />
+</shape>

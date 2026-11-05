@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 详情页纵向压暗层：顶部让主剧照透出来，越往下越黑，底部接近纯色。
+     **必须是一段 gradient**。
+     2026-11-05 之前这里是 layer-list 拆成「上下两段」（各 360 高）拼出来的，
+     两段端点色虽然一样（#8C0B0C0F），但斜率不同 —— 上半段 360px 里涨 55%，
+     下半段 360px 里只涨 42%，于是正中间 y=360 处出现一条肉眼可见的横向折线。
+     真机上表现就是"屏幕中间有条线"。单段线性插值不会有这个问题。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="270"
+        android:endColor="#F00B0C0F"
+        android:startColor="#000B0C0F" />
+</shape>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 「历史」胶囊：常态暗玻璃，聚焦暖白 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="@dimen/vs_8" />
+            <solid android:color="#F4F1EA" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="@dimen/vs_8" />
+            <solid android:color="#0DFFFFFF" />
+            <stroke android:width="1mm" android:color="#17FFFFFF" />
+        </shape>
+    </item>
+</selector>

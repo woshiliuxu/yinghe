@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 配置接口管理弹窗（2026-11-05）：
+     影视仓式多配置——本地存一份配置列表（API_URL + API_HISTORY），
+     点行即切换（重启后生效），条目右侧删除按钮可移除，底部可新增。 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="@dimen/vs_560"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_dialog_bg_main"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/vs_30"
+        android:paddingTop="@dimen/vs_24"
+        android:paddingRight="@dimen/vs_30"
+        android:paddingBottom="@dimen/vs_24">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dia_config_title"
+            android:textColor="@color/dialog_text_main"
+            android:textSize="@dimen/ts_26"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/vs_4"
+            android:text="@string/dia_config_tip"
+            android:textColor="@color/dialog_text_sub"
+            android:textSize="@dimen/ts_12" />
+
+        <com.owen.tvrecyclerview.widget.TvRecyclerView
+            android:id="@+id/listConfig"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/vs_16"
+            android:orientation="vertical"
+            app:tv_horizontalSpacingWithMargins="@dimen/vs_8"
+            app:tv_layoutManager="V7LinearLayoutManager"
+            app:tv_selectedItemIsCentered="false"
+            app:tv_verticalSpacingWithMargins="@dimen/vs_8" />
+
+        <TextView
+            android:id="@+id/btnAddConfig"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/vs_50"
+            android:layout_marginTop="@dimen/vs_16"
+            android:background="@drawable/button_dialog_main"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="@string/dia_config_add"
+            android:textColor="@color/dialog_row_text"
+            android:textSize="@dimen/ts_15" />
+    </LinearLayout>
+</FrameLayout>

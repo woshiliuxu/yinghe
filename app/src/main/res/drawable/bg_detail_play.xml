@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 详情页主按钮「播放」。
+     2026-11-05 改：焦点必须一眼看出来。
+     之前常态 #EDE9E0、焦点 #F4F1EA，两个色只差 7 级亮度，电视上等于没变化
+     —— 用户原话"焦点在播放键上但不知道焦点在哪"。
+     现在焦点态是纯白 + 一圈深色内描边，配合代码里的 1.05 放大，三重信号。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true" android:state_pressed="true">
+        <shape>
+            <corners android:radius="@dimen/vs_28" />
+            <solid android:color="#E8E4DB" />
+            <stroke
+                android:width="3mm"
+                android:color="#590B0C0F" />
+        </shape>
+    </item>
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="@dimen/vs_28" />
+            <solid android:color="#FFFFFF" />
+            <stroke
+                android:width="3mm"
+                android:color="#590B0C0F" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="@dimen/vs_28" />
+            <solid android:color="#EDE9E0" />
+        </shape>
+    </item>
+</selector>

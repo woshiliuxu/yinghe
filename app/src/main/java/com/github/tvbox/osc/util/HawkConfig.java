@@ -29,6 +29,8 @@ public class HawkConfig {
     public static final String HOME_SEARCH_POSITION = "search_position"; // true=Up, false=Down
     public static final String HOME_MENU_POSITION = "menu_position";     // true=Up, false=Down
 	public static final String HOME_DEFAULT_SHOW = "home_default_show";  //启动时直接进直播的开关
+    public static final String HOME_CONFIG_TIME = "home_config_time";    //上次从网络成功拉配置的时间戳（毫秒）
+    public static final String BING_WP_LAST = "bing_wp_last";            //上次随机壁纸选中的必应图片 id，避免连按换出同一张
 
     // Player Settings
     public static final String SHOW_PREVIEW = "show_preview";

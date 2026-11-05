@@ -1,32 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 内容类型胶囊（原「分类按钮」）：
+     焦点由白描边表达，当前分类由白色实底 + 深色字表达，两者互不覆盖。
+     文字色走 sel_pill_text，代码里不要再硬写白色，否则白底上会白字白底看不见。 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="@dimen/vs_45"
-    android:background="@drawable/button_home_sort_focus"
+    android:layout_height="@dimen/vs_44"
+    android:background="@drawable/sel_pill_bg"
     android:clickable="true"
     android:focusable="true"
     android:focusableInTouchMode="true"
+    android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingLeft="@dimen/vs_20"
-    android:paddingRight="@dimen/vs_20">
+    android:paddingLeft="@dimen/vs_22"
+    android:paddingRight="@dimen/vs_22">
 
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:duplicateParentState="true"
         android:focusable="false"
         android:gravity="center"
-        android:textColor="@color/color_FFFFFF_70"
-        android:textSize="@dimen/ts_30" />
+        android:singleLine="true"
+        android:textColor="@color/sel_pill_text"
+        android:textSize="@dimen/ts_24" />
 
     <ImageView
         android:id="@+id/tvFilter"
-        android:layout_width="@dimen/vs_30"
-        android:layout_height="@dimen/vs_30"
+        android:layout_width="@dimen/vs_26"
+        android:layout_height="@dimen/vs_26"
         android:layout_gravity="center"
-        android:layout_marginStart="@dimen/vs_3"
-        android:layout_marginLeft="@dimen/vs_3"
+        android:layout_marginStart="@dimen/vs_6"
+        android:layout_marginLeft="@dimen/vs_6"
         android:src="@drawable/icon_filter"
         android:visibility="gone" />
 </LinearLayout>

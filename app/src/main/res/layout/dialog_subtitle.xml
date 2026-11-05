@@ -31,7 +31,7 @@
                 android:shadowDy="0"
                 android:shadowRadius="5"
                 android:singleLine="true"
-                android:textColor="@color/color_FFFFFF"
+                android:textColor="@color/dialog_text_main"
                 android:textSize="@dimen/ts_26"
                 android:textStyle="bold"
                 tools:text="Subtitle Options" />
@@ -62,7 +62,7 @@
                     android:gravity="center"
                     android:padding="@dimen/vs_10"
                     android:text="Internal"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_20" />
 
                 <TextView
@@ -79,7 +79,7 @@
                     android:gravity="center"
                     android:padding="@dimen/vs_10"
                     android:text="Local"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_20" />
 
                 <TextView
@@ -96,7 +96,7 @@
                     android:gravity="center"
                     android:padding="@dimen/vs_10"
                     android:text="Remote"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_20" />
             </LinearLayout>
 
@@ -126,7 +126,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="2"
                     android:text="@string/sub_size"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_20"
                     android:textStyle="bold" />
 
@@ -153,7 +153,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="2"
                     android:text="16"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_24"
                     android:textStyle="bold" />
 
@@ -195,7 +195,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="2"
                     android:text="@string/sub_style"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_20"
                     android:textStyle="bold" />
 
@@ -219,7 +219,7 @@
                     android:layout_marginRight="@dimen/vs_40"
                     android:gravity="center"
                     android:text="@string/sub_style_text"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_24"
                     android:textStyle="bold" />
 
@@ -261,7 +261,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="2"
                     android:text="@string/sub_delay"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_20"
                     android:textStyle="bold" />
 
@@ -288,7 +288,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="2"
                     android:text="16"
-                    android:textColor="@color/color_FFFFFF"
+                    android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_24"
                     android:textStyle="bold" />
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 详情页左信息栏：玻璃面。
+     上亮下暗的极淡渐变（14% → 8% 白）+ 1px 描边，跟首页侧栏同一套语言，
+     不写纯色块：纯色在模糊海报背景上会显出一块"贴纸"，玻璃渐变才有悬浮感。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="@dimen/vs_22" />
+    <gradient
+        android:angle="270"
+        android:startColor="#18FFFFFF"
+        android:endColor="#0AFFFFFF" />
+    <stroke
+        android:width="1mm"
+        android:color="#26FFFFFF" />
+</shape>

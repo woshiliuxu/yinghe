@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 弹窗主底板（2026-11-05 第二版：亮面板），与 shape_dialog_bg 同步翻亮。
+     全屏输入类弹窗（配置地址 / 推送 / 字幕等）共用。 -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <corners android:radius="@dimen/vs_15" />
-    <solid android:color="@color/color_6A6A6A_95" />
+    <corners android:radius="@dimen/vs_22" />
+    <solid android:color="#F7F5F1" />
 </shape>

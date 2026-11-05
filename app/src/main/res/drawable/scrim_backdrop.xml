@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 模糊底图上的压暗层：顶部压暗保证状态文字可读，底部压暗把海报墙托起来，
+     中间留一点亮，让整屏有「光从片名处透出来」的层次。 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <gradient
+                android:angle="270"
+                android:startColor="#CC07080A"
+                android:centerColor="#9907080A"
+                android:endColor="#E607080A" />
+        </shape>
+    </item>
+</layer-list>

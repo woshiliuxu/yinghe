@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 分类胶囊文字色：
+     当前分类（白底）→ 深色字；拿到焦点但非当前分类 → 纯白字；其余 → 半透明白。 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true" android:color="@color/ui_on_accent" />
+    <item android:state_focused="true" android:color="@color/ui_text_1" />
+    <item android:color="#B8FFFFFF" />
+</selector>

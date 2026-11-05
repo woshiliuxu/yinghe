@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 设置页右侧选项行：常态玻璃底，聚焦整行翻暖白（A 方案定稿） -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="#F4F1EA" />
+            <stroke android:width="2mm" android:color="#33F4F1EA" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="@dimen/vs_12" />
+            <solid android:color="#0DFFFFFF" />
+        </shape>
+    </item>
+</selector>

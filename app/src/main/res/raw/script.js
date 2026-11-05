@@ -1,8 +1,89 @@
+/* ============================================================
+   影盒 · 手机助手 script.js（2026-11-05 三页面 + 玻璃导航版）
+   搜索 / 推送 / 配置 各自独立页面，底部液态玻璃导航栏切换。
+   ============================================================ */
+
+/* ---------- 页面切换 ---------- */
+
+function switchView(name) {
+    $('.yhg-view').removeClass('is-active');
+    $('#view' + name).addClass('is-active');
+    $('.lg-dock__item').removeClass('is-on').attr('aria-selected', 'false');
+    $('#dock' + name).addClass('is-on').attr('aria-selected', 'true');
+    try { localStorage.setItem('yhg_view', name); } catch (e) { }
+    window.scrollTo(0, 0);
+}
+
+/* ---------- 高级选项折叠 ---------- */
+
+function toggleAdv() {
+    $('#advBody').toggleClass('is-open');
+    $('#advChev').toggleClass('is-open');
+}
+
+/* ---------- 动作 ---------- */
+
+function doAction(action, kv) {
+    kv['do'] = action;
+    $.post('/action', kv, function (data) {
+        okToast('已发送到电视');
+    }).fail(function () {
+        warnToast('发送失败，请检查连接');
+    });
+    return false;
+}
+
 function search() {
-    doAction('search', { word: $('#search_key_word').val() });
+    var word = $('#search_key_word').val();
+    if (!word) return warnToast('先输入关键字');
+    saveHistory(word);
+    doAction('search', { word: word });
+    $('#search_key_word').val('').closest('.search-bar').removeClass('has-text');
+    renderHistory();
+}
+
+/* ---------- 搜索历史（手机本地保存，最近 10 条） ---------- */
+
+var HIS_KEY = 'yhg_search_history';
+
+function loadHistory() {
+    try {
+        var raw = localStorage.getItem(HIS_KEY);
+        var arr = raw ? JSON.parse(raw) : [];
+        return $.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+}
+
+function saveHistory(word) {
+    word = $.trim(word);
+    if (!word) return;
+    var arr = loadHistory();
+    arr = $.grep(arr, function (w) { return w !== word; });
+    arr.unshift(word);
+    if (arr.length > 10) arr = arr.slice(0, 10);
+    try { localStorage.setItem(HIS_KEY, JSON.stringify(arr)); } catch (e) { }
+}
+
+function renderHistory() {
+    var arr = loadHistory();
+    var box = $('#searchHistory');
+    if (!arr.length) { box.hide(); return; }
+    box.show();
+    $('#hisChips').empty();
+    $.each(arr, function (i, w) {
+        $('<button type="button" class="his-chip"></button>')
+            .text(w)
+            .on('click', function () {
+                $('#search_key_word').val(w).focus();
+                $('#search_key_word').closest('.search-bar').toggleClass('has-text', !!w);
+                search();
+            })
+            .appendTo('#hisChips');
+    });
 }
 
 function api() {
+    if (!$('#diy_api_url').val()) return warnToast('先粘贴配置地址');
     doAction('api', { url: $('#diy_api_url').val() });
 }
 
@@ -19,271 +100,70 @@ function proxys() {
 }
 
 function push() {
+    if (!$('#push_url').val()) return warnToast('先粘贴播放地址');
     doAction('push', { url: $('#push_url').val() });
+    $('#push_url').val('');
 }
 
-function doAction(action, kv) {
-    kv['do'] = action;
-    // alert(JSON.stringify(kv));
-    $.post('/action', kv, function (data) {
-        console.log(data);
-        // alert(data);
-    });
-    return false;
-}
+/* ---------- Toast 提示 ---------- */
 
-function tpl_top(path) {
-    return `<a class="weui-cell  weui-cell_access" href="javascript:void(0)" onclick="listFile('` + path + `')">
-    <div class="weui-cell__hd"><img src="`+ ic_dir + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
-    <span class="weui-cell__bd">
-        <span>..</span>
-    </span>
-    <span class="weui-cell__ft">
-    </span>
-    </a>`;
-}
+var toastTimer = null;
 
-function tpl_dir(name, time, path) {
-    return `<a class="weui-cell  weui-cell_access" href="#" onclick="listFile('` + path + `')">
-    <div class="weui-cell__hd"><img src="`+ ic_dir + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
-    <span class="weui-cell__bd">
-    <span>`+ name + `</span>
-        <div class="weui-cell__desc">`+ time + `</div>
-    </span>
-    <span class="weui-cell__ft">
-    </span>
-    </a>`;
-}
-
-function tpl_file(name, time, path, canDel) {
-    return `<a class="weui-cell  weui-cell_access" href="javascript:void(0)" onclick="selectFile('` + path + `', ` + canDel + `)">
-    <div class="weui-cell__hd"><img src="`+ ic_file + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
-    <span class="weui-cell__bd">
-        <span>`+ name + `</span>
-        <div class="weui-cell__desc">`+ time + `</div>
-    </span>
-    </a>`;
-}
-
-function clear_list() {
-    $('#file_list').html('');
-}
-
-function add_file(node) {
-    $('#file_list').append(node);
-}
-
-let ic_dir = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA7AAAAOwBeShxvQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAIoSURBVFiF7Ze/T9RgGMc/T9/WO+74IXdRNKCJxETPQaOJi8LoxiouTurmv+DAYvwH3JzVhOhgSHByMTqY6GBCCBFMcJFwURC4O1rbvo8DoIg9rvHuYOGTdGjfb/J88vZpn1Z0bKw7JjsiaCcJqMiCKQ1OyuhonLTeLG5MZlLQq/UCooqd/nwfuNcOAUfgSorcbR0fN20RACRF7hgzc0PtEJB47IGmCSq8EXjbOKjG+VG54Buv531puK/WkfO2L0cY+ZI5ksVfD84vTt91U5vCEBvH7qxU0GqV18PX+Xg2+e6GFmZXhPlc3zOX5dW0Do2xMbIeEBuXmVMX68Y8BwxQzhXFlWqtdQKbzA+cIch0pMq630vgX55DTJgY+Bn18ql8hyAqphb4VjjeMLPVeG722nOKztddw0EPTARPUws0ohqB3TRw8w2KAwyaCRara/i2u+niCqxHf85TPQWe+Jw2L3kX3GhaYCdip5xU74FV28dSPNB8QZR8VEbCiCe1h+kFWopCVLH42oWz58Xh98s/y9o+CWzjQOBA4EBg3wX+mgWxdwlrTtSJRrjBK0T99glUC49R52jdcG75Fp7/on0C4BGGIeWFMtsHRL4zT2/hMCoerebfHkgYTWm+2/+XHTsQ4h3y6D/ZnxgWjRKvt0wgv3QTa+rN/I0mbDVipxxLe3c5kWjNgqIOSOO/nRajMVu99kF0hi4iM4LQtSfVrWbigHMa21k35NEvWSq4Cnb1Ay8AAAAASUVORK5CYII=';
-let ic_file = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA7AAAAOwBeShxvQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAJdSURBVFiF7ZfLaxNRFMa/c+8MbZO0xAgmGIIxUmtsQCkobsSNO12I7v0PXAjuBDeCCN0I/gvdu3HhQlHBBwouTA1UUoulKXmYSDp59TEzx4XUpmFm0tsMTRd+u5l7uN9vvnvunRmCh+r1+km2+CWAlFedm5byP79PIHRx8tKk4VYjvCawTfvafs0BoN1qThWNYn7h3cK4EgDPI23P07Ox5pM7+zXfVqPRPFbulPO517nQngBmv3JwkwIPQXQDXDs9KAAANI1WtLpVXcx9yEU8AWY/WU95nRvL1tVbfhgLKXcgGq1oZe3XajabPdJdo3VfMOg2AAL7YQ8kUyewIiQs0wQAbG5sjHbqnUUARx0BAMi/IP4oEAxganpnFcuFEggU7q7x3AUHoaED9C6Bp5gZlmUpGQgSENL9OR0B2KUJCssFFAslJQAShPMXzkHX9b0DuCmRTCCRTCgB9JPzSeirhbeUEjDqBgyjoWQgiBCLxyCEcx8494DLZLZtwzbVmpAFeUaqlEA4EkY4Eu5fqKBDeg64bsNVVEoVJQMCITOTga47WznfJefJ4onjiMWjygBSk67jSgcRCYImlNqmr4beA0M/iP4ncDgT+BfBAUThmQDbpv+OPZ+8ngBa+xWEWfbFt9PqgJmh6/r7XR5OxduIkpcw9uMsWE4MZM7QMKoFq2uBF2dS6VO1vgArWzPIjDwHSUCOA2DXf0sFit9z6XS61nu7F8AEgLfrD/CtfQUhWR3YNzZS+ngzdPc+ps03TuO7Xjuzn61HzHQPDL1pAvaAu4AZJYvo+uPL9MWt5g/5NsVsHsMO8wAAAABJRU5ErkJggg==';
-
-let current_root = '';
-let current_parent = '';
-let current_remote = '';
-let current_file = '';
-
-function selectFile(path, canDel) {
-    current_file = path;
-    if (canDel)
-        $("#delFileBtn").show();
-    else
-        $("#delFileBtn").hide();
-    // $("#fileUrl0")[0].value = current_remote.replace('clan://', 'http://') + 'file/' + current_file;
-    $("#fileUrl1")[0].value = "clan://localhost/" + current_file;
-    $("#fileUrl2")[0].value = current_remote + current_file;
-    $("#fileInfoDialog").show();
-}
-
-function fileToApi(type) {
-    if (type === 1) {
-        doAction('api', { url: "clan://localhost/" + current_file });
-    } else {
-        doAction('api', { url: current_remote + current_file });
-    }
-}
-
-function hideFileInfo() {
-    $("#fileInfoDialog").hide();
-}
-
-function listFile(path) {
-    $('#loadingToast').show();
-    $.get('/file/' + path, function (res) {
-        let info = JSON.parse(res);
-        let parent = info.parent;
-        let canDel = info.del === 1;
-        current_root = path;
-        current_parent = parent;
-        current_remote = info.remote;
-        let array = info.files;
-        if (path === '' && array.length == 0)
-            warnToast('读取本地文件失败，可能没有存储权限');
-        clear_list();
-        if (parent !== '.')
-            add_file(tpl_top(parent));
-
-        if (canDel) {
-            $('#delCurFolder').show();
-        } else {
-            $('#delCurFolder').hide();
-        }
-
-        array.forEach(node => {
-            if (node.dir === 1) {
-                add_file(tpl_dir(node.name, node.time, node.path));
-            } else {
-                add_file(tpl_file(node.name, node.time, node.path, canDel));
-            }
-        });
-        $('#loadingToast').hide();
-    }).fail(function () {
-        warnToast('读取本地文件失败，可能没有存储权限');
-        $('#loadingToast').hide();
-    });
+function showToast(msg, type) {
+    var box = $('#warnToastBox');
+    box.toggleClass('is-ok', type === 'ok');
+    $('#warnToastContent').html(msg);
+    $('#warnToast').show();
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+        $('#warnToast').hide();
+    }, 1400);
 }
 
 function warnToast(msg) {
-    $('#warnToastContent').html(msg);
-    $('#warnToast').show();
-    setTimeout(() => {
-        $('#warnToast').hide();
-    }, 1000);
+    showToast(msg, 'warn');
 }
 
-function uploadFile() {
-    $('#file_uploader').val("");
-    $('#file_uploader').click();
+function okToast(msg) {
+    showToast(msg, 'ok');
 }
 
-function uploadTip() {
-    let files = $('#file_uploader')[0].files;
-    if (files.length <= 0)
-        return false;
-    let tip = '';
-    for (var i = 0; i < files.length; i++) {
-        tip += (files[i].name) + ',';
-    }
-    $('#uploadTipContent').html(tip);
-    $('#uploadTip').show();
-}
-
-function doUpload(yes) {
-    $('#uploadTip').hide();
-    if (yes == 1) {
-        let files = $('#file_uploader')[0].files;
-        if (files.length <= 0)
-            return false;
-        var formData = new FormData();
-        formData.append('path', current_root);
-        for (i = 0; i < files.length; i++) {
-            formData.append("files-" + i, files[i]);
-        }
-        $('#loadingToast').show();
-        $.ajax({
-            url: '/upload',
-            type: 'post',
-            data: formData,
-            processData: false,
-            contentType: false,
-            complete: function () {
-                $('#loadingToast').hide();
-                listFile(current_root);
-            }
-        });
-    }
-}
-
-function newFolder() {
-    $('#newFolder').show();
-}
-
-function doNewFolder(yes) {
-    $('#newFolder').hide();
-    if (yes == 1) {
-        let name = $('#newFolderContent')[0].value.trim();
-        if (name.length <= 0)
-            return false;
-        $('#loadingToast').show();
-        $.post('/newFolder', { path: current_root, name: '' + name }, function (data) {
-            $('#loadingToast').hide();
-            listFile(current_root);
-        });
-    }
-}
-
-
-function delFolder() {
-    $('#delFolderContent').html('是否删除 ' + current_root);
-    $('#delFolder').show();
-}
-
-function doDelFolder(yes) {
-    $('#delFolder').hide();
-    if (yes == 1) {
-        $('#loadingToast').show();
-        $.post('/delFolder', { path: current_root }, function (data) {
-            $('#loadingToast').hide();
-            listFile(current_parent);
-        });
-    }
-}
-
-function delFolder() {
-    $('#delFolderContent').html('是否删除 ' + current_root);
-    $('#delFolder').show();
-}
-
-function doDelFolder(yes) {
-    $('#delFolder').hide();
-    if (yes == 1) {
-        $('#loadingToast').show();
-        $.post('/delFolder', { path: current_root }, function (data) {
-            $('#loadingToast').hide();
-            listFile(current_parent);
-        });
-    }
-}
-
-function delFile() {
-    hideFileInfo();
-    $('#delFileContent').html('是否删除 ' + current_file);
-    $('#delFile').show();
-}
-
-function doDelFile(yes) {
-    $('#delFile').hide();
-    if (yes == 1) {
-        $('#loadingToast').show();
-        $.post('/delFile', { path: current_file }, function (data) {
-            $('#loadingToast').hide();
-            listFile(current_root);
-        });
-    }
-}
-
-function showPanel(id) {
-    let tab = $('#tab' + id)[0];
-    $(tab).attr('aria-selected', 'true').addClass('weui-bar__item_on');
-    $(tab).siblings('.weui-bar__item_on').removeClass('weui-bar__item_on').attr('aria-selected', 'false');
-    var panelId = '#' + $(tab).attr('aria-controls');
-    if (id === 3 && current_remote.length === 0) {
-        listFile('')
-    }
-    $(panelId).css('display', 'block');
-    $(panelId).siblings('.weui-tab__panel').css('display', 'none');
-}
+/* ---------- 初始化 ---------- */
 
 $(function () {
-    $('.weui-tabbar__item').on('click', function () {
-        showPanel(parseInt($(this).attr('id').substr(3)));
+    // 页面由电视端服务直接提供，副标题告知当前控制的是哪台电视
+    var host = (window.location.hostname || window.location.host || '').trim();
+    // 品牌行已删，地址并入导航提示；页面顶部只留大标题
+
+    // 恢复上次停留的页面；push.html / api.html 旧入口也各自直达
+    var url = window.location.href;
+    var saved = null;
+    try { saved = localStorage.getItem('yhg_view'); } catch (e) { }
+    if (url.indexOf('push.html') > 0) switchView('Push');
+    else if (url.indexOf('api.html') > 0 || url.indexOf('all.html') > 0) switchView('Config');
+    else if (saved === 'Push' || saved === 'Config' || saved === 'Search') switchView(saved);
+    else switchView('Config');
+
+    // 输入非空时显示清空按钮
+    $('.search-bar input').on('input', function () {
+        $(this).closest('.search-bar').toggleClass('has-text', !!this.value);
+    });
+
+    // 回车提交
+    $('#diy_api_url').on('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); api(); }
+    });
+    $('#search_key_word').on('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); search(); }
+    });
+    $('#push_url').on('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); push(); }
+    });
+
+    // 搜索历史：初始渲染 + 清空
+    renderHistory();
+    $('#hisClear').on('click', function () {
+        try { localStorage.removeItem(HIS_KEY); } catch (e) { }
+        renderHistory();
     });
 });
-
-var url = window.location.href;
-if (url.indexOf('push.html') > 0)
-    showPanel(2);
-else if (url.indexOf('api.html') > 0)
-    showPanel(3);
-else if (url.indexOf('all.html') > 0)
-    showPanel(3);
-else
-    showPanel(1);
