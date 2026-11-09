@@ -54,8 +54,8 @@ gradlew assembleArmeabiGenericNormalDebug
 ## 分支说明
 
 - 上游：[takagen99/Box](https://github.com/takagen99/Box)（`origin`，仅用于拉取更新）
-- 本仓库：[woshiliuxu/yinghe](https://github.com/woshiliuxu/yinghe)（`mine`）
-- 定制改动在 `local-wip-20261105` 分支，基线上游 `258a5fe`
+- 本仓库：[woshiliuxu/yinghe](https://github.com/woshiliuxu/yinghe)（`mine`，默认分支 `main`）
+- 全部定制改动都在 `main` 分支，基线上游 `258a5fe`
 
 ## 声明
 
