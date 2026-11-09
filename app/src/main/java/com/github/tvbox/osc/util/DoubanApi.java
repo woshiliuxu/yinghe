@@ -50,8 +50,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class DoubanApi {
 
-    /** 缓存文件 key（不含日期，日期写在内容第一行，过期就重新拉） */
-    private static final String CACHE_KEY = "douban_hot_v2";
+    /** 缓存文件 key（不含日期，日期写在内容第一行，过期就重新拉）；加过滤后换 v3 防止读到旧榜 */
+    private static final String CACHE_KEY = "douban_hot_v3";
+
+    /**
+     * 评分下限：低于这个分数的条目直接不上海报墙。
+     * 热门榜是热度序，低分新片常混在中间（实测 200 部电影里有 41 部 <6），
+     * 不筛的话海报墙上会有一堆 5 分片。未开分（豆瓣返 0）的照留 —— 那不叫低分，
+     * 是新片还没攒够评分，筛掉反而把最新的片子筛没了。
+     */
+    private static final double MIN_RATE = 6.0;
     private static final String CACHE_SPLIT = "\n";
 
     private static final String COLLECTION_BASE = "https://m.douban.com/rexxar/api/v2/subject_collection/";
@@ -59,9 +67,13 @@ public class DoubanApi {
 
     /** rexxar 单页硬上限；传更大的数服务端按 50 截断，所以分页得自己来 */
     private static final int PAGE = 50;
-    /** 采集目标：电影 150（3 页）、剧集 100（2 页），够铺满海报墙且不至于太慢 */
-    private static final int MOVIE_TARGET = 150;
-    private static final int TV_TARGET = 100;
+    /**
+     * 采集目标：电影 200（4 页）、剧集 150（3 页）。
+     * 比海报墙实际需要多一些，因为 {@link #MIN_RATE} 会筛掉一部分低分片，
+     * 多拉一页刚好补回来（实测筛完电影剩约 160、剧集约 115）。
+     */
+    private static final int MOVIE_TARGET = 200;
+    private static final int TV_TARGET = 150;
 
     /** 影片所属类型，用来区分电影 / 剧集（也决定解析哪套封面字段） */
     public static final int KIND_MOVIE = 0;
@@ -263,6 +275,9 @@ public class DoubanApi {
     /**
      * 两路交错合并：电影、剧集、电影、剧集……
      * 同一部作品按「去掉季数后的名字」去重，否则《万物生灵》第四/五/六季会并排占三格。
+     *
+     * <p>评分过滤放在这里而不是 {@link #parse}：parse 的返回条数被 fetchPage 用来
+     * 判断「本页不满 = 已到底」，在那儿筛会让一页 50 条筛成 40 条、误判到底不再翻页。
      */
     private static List<Movie.Video> merge(List<Movie.Video> movies, List<Movie.Video> tvs) {
         List<Movie.Video> out = new ArrayList<>();
@@ -271,14 +286,24 @@ public class DoubanApi {
         while (i < movies.size() || j < tvs.size()) {
             if (i < movies.size()) {
                 Movie.Video v = movies.get(i++);
-                if (seen.add(baseName(v.name))) out.add(v);
+                if (passRate(v) && seen.add(baseName(v.name))) out.add(v);
             }
             if (j < tvs.size()) {
                 Movie.Video v = tvs.get(j++);
-                if (seen.add(baseName(v.name))) out.add(v);
+                if (passRate(v) && seen.add(baseName(v.name))) out.add(v);
             }
         }
         return out;
+    }
+
+    /** 评分达标才上墙：无评分（空串）放行，有评分但低于 MIN_RATE 的去掉 */
+    private static boolean passRate(Movie.Video v) {
+        if (v == null || TextUtils.isEmpty(v.rate)) return true;
+        try {
+            return Double.parseDouble(v.rate.trim()) >= MIN_RATE;
+        } catch (Throwable th) {
+            return true;
+        }
     }
 
     /** 「万物生灵 第六季」→「万物生灵」，用于去重 */
