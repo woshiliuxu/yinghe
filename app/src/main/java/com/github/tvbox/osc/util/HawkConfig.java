@@ -66,6 +66,8 @@ public class HawkConfig {
 
     // TMDB（首页大图轮播）—— v4 Read Access Token，纯壳：只认用户在手机端配的，空 = 不启用
     public static final String TMDB_TOKEN = "tmdb_token";
+    /** 密钥写入时间（毫秒），弹窗里显示「配置于 xxxx-xx-xx」，仅状态展示用 */
+    public static final String TMDB_TOKEN_TIME = "tmdb_token_time";
 
     // Live Settings
     public static final String LIVE_CHANNEL = "last_live_channel_name";

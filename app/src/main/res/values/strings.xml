@@ -282,5 +282,19 @@
     <string name="dia_config_in_use">使用中</string>
     <string name="dia_config_del_cur">使用中的配置不能删除</string>
     <string name="dia_config_deleted">已删除</string>
+    <string name="dia_config_tip_empty">配置在手机端添加，添加后这里会出现可切换的配置列表</string>
+    <string name="dia_config_empty_title">还没有添加数据源</string>
+    <string name="dia_config_empty_step1">1 · 手机扫描右侧二维码</string>
+    <string name="dia_config_empty_step2">2 · 在配置页粘贴地址并保存</string>
+    <string name="dia_config_empty_step3">3 · 电视自动重启并加载</string>
+    <string name="dia_tmdb_title">TMDB 密钥</string>
+    <string name="dia_tmdb_status_on">已配置</string>
+    <string name="dia_tmdb_status_off">未配置</string>
+    <string name="dia_tmdb_type_v4">v4 Read Token</string>
+    <string name="dia_tmdb_type_v3">v3 API Key</string>
+    <string name="dia_tmdb_at">配置于 %1$s</string>
+    <string name="dia_tmdb_empty_tip">还没有配置，首页大图不会显示；扫码后到「高级选项 → TMDB Token」填入</string>
+    <string name="dia_tmdb_change_tip">更换或清空请在手机端操作</string>
+    <string name="dia_tmdb_qr_tip">手机扫码打开配置页</string>
 
 </resources>

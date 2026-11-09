@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- TMDB 密钥弹窗（0.11.5：纯扫码面板）。
-     遥控器没法粘贴长 Token，TV 端不再放输入框——二维码扫一下，
-     手机配置页里粘贴保存即生效（配置 → 高级选项 → TMDB Token）。 -->
+<!-- TMDB 密钥弹窗（0.11.7：双状态 + 等高对齐）。
+     未配置 = 只有码（右栏铺满居中）；
+     已配置 = 左栏状态卡（已配置徽标 + 掩码 Token + 配置日期），右栏缩为更换入口。
+     对齐规则：状态卡与二维码都是 vs_170 高、同顶对齐，左右两栏底边齐平；
+     弹窗高度两态一致，「TMDB 密钥」标题不位移。
+     遥控器没法粘贴长 Token，TV 端始终不放输入框。 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/vs_520"
     android:layout_height="wrap_content"
     android:background="@drawable/shape_dialog_bg_main"
-    android:gravity="center_horizontal"
     android:orientation="vertical"
     android:paddingLeft="@dimen/vs_24"
     android:paddingTop="@dimen/vs_20"
@@ -14,39 +16,129 @@
     android:paddingBottom="@dimen/vs_20">
 
     <TextView
+        android:id="@+id/tvTmdbTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TMDB 密钥"
+        android:text="@string/dia_tmdb_title"
         android:textColor="@color/dialog_text_main"
         android:textSize="@dimen/ts_20"
         android:textStyle="bold" />
 
-    <ImageView
-        android:id="@+id/ivTmdbQR"
-        android:layout_width="@dimen/vs_170"
-        android:layout_height="@dimen/vs_170"
-        android:layout_marginTop="@dimen/vs_16"
-        android:background="#FFFFFF"
-        android:contentDescription="扫码配置二维码" />
-
-    <TextView
+    <LinearLayout
+        android:id="@+id/llTmdbBody"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/vs_12"
-        android:gravity="center"
-        android:lineSpacingExtra="2dp"
-        android:text="手机扫码打开配置页 → 高级选项 → TMDB Token，粘贴保存立即生效（不配置 = 首页不显示 TMDB 大图）"
-        android:textColor="@color/dialog_text_sub"
-        android:textSize="@dimen/ts_15" />
+        android:layout_marginTop="@dimen/vs_16"
+        android:gravity="top"
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/tvTmdbAddr"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/vs_4"
-        android:ellipsize="middle"
-        android:singleLine="true"
-        android:textColor="@color/dialog_hint"
-        android:textSize="@dimen/ts_11" />
+        <!-- 已配置状态卡：与右侧二维码同高（170）、同顶；未配置时整块 gone -->
+        <LinearLayout
+            android:id="@+id/llTmdbCard"
+            android:layout_width="@dimen/vs_240"
+            android:layout_height="@dimen/vs_170"
+            android:layout_marginRight="@dimen/vs_24"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="@dimen/vs_8"
+                    android:layout_height="@dimen/vs_8"
+                    android:background="@drawable/shape_dot_ok" />
+
+                <TextView
+                    android:id="@+id/tvTmdbStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/vs_8"
+                    android:text="@string/dia_tmdb_status_on"
+                    android:textColor="@color/dialog_text_main"
+                    android:textSize="@dimen/ts_15"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTmdbType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/vs_8"
+                    android:text="@string/dia_tmdb_type_v4"
+                    android:textColor="@color/dialog_text_sub"
+                    android:textSize="@dimen/ts_12" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvTmdbMasked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vs_12"
+                android:ellipsize="middle"
+                android:singleLine="true"
+                android:textColor="@color/dialog_text_main"
+                android:textSize="@dimen/ts_15" />
+
+            <TextView
+                android:id="@+id/tvTmdbTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vs_6"
+                android:textColor="@color/dialog_hint"
+                android:textSize="@dimen/ts_11"
+                android:visibility="gone" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vs_16"
+                android:lineSpacingExtra="3mm"
+                android:text="@string/dia_tmdb_change_tip"
+                android:textColor="@color/dialog_text_sub"
+                android:textSize="@dimen/ts_12" />
+        </LinearLayout>
+
+        <!-- 右栏铺满剩余宽度并居中：未配置时就是一张居中的码，已配置时靠右排 -->
+        <LinearLayout
+            android:layout_width="@dimen/vs_0"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/ivTmdbQR"
+                android:layout_width="@dimen/vs_170"
+                android:layout_height="@dimen/vs_170"
+                android:background="#FFFFFF"
+                android:contentDescription="@string/dia_config_qr" />
+
+            <TextView
+                android:id="@+id/tvTmdbTip"
+                android:layout_width="@dimen/vs_180"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vs_10"
+                android:gravity="center"
+                android:lineSpacingExtra="2mm"
+                android:text="@string/dia_tmdb_empty_tip"
+                android:textColor="@color/dialog_text_sub"
+                android:textSize="@dimen/ts_12" />
+
+            <TextView
+                android:id="@+id/tvTmdbAddr"
+                android:layout_width="@dimen/vs_180"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vs_4"
+                android:ellipsize="middle"
+                android:gravity="center"
+                android:singleLine="true"
+                android:textColor="@color/dialog_hint"
+                android:textSize="@dimen/ts_11" />
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

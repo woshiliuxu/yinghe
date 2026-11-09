@@ -68,6 +68,7 @@
     <color name="dialog_text_main">#D914161A</color>
     <color name="dialog_text_sub">#8C14161A</color>
     <color name="dialog_hint">#5C14161A</color>
+    <color name="dialog_ok">#FF2E8B57</color>
 
     <color name="transparent">#00000000</color>
     <color name="color_FF000000">#FF000000</color>

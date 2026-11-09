@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 空态引导框：虚线描边 + 极浅底色，提示「这里还没有内容」而不是一块空白 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#0A14161A" />
+    <stroke
+        android:width="1mm"
+        android:color="#2914161A"
+        android:dashWidth="5mm"
+        android:dashGap="3mm" />
+    <corners android:radius="12mm" />
+</shape>

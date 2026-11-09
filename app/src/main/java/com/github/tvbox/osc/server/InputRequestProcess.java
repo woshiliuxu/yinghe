@@ -119,8 +119,10 @@ public class InputRequestProcess implements RequestProcess {
                             String token = params.get("token") == null ? "" : params.get("token").trim();
                             if (token.isEmpty()) {
                                 Hawk.delete(HawkConfig.TMDB_TOKEN);
+                                Hawk.delete(HawkConfig.TMDB_TOKEN_TIME);
                             } else {
                                 Hawk.put(HawkConfig.TMDB_TOKEN, token);
+                                Hawk.put(HawkConfig.TMDB_TOKEN_TIME, System.currentTimeMillis());
                             }
                             TmdbApi.invalidateCache();
                             EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_TMDB_CHANGE));

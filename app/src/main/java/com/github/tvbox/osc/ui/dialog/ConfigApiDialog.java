@@ -84,6 +84,16 @@ public class ConfigApiDialog extends BaseDialog {
         });
 
         refreshQRCode();
+        updateEmptyState();
+    }
+
+    /** 空态切换：列表与引导框共用同一块 170 高的区域，弹窗高度不变，标题不位移 */
+    private void updateEmptyState() {
+        boolean empty = configs.isEmpty();
+        findViewById(R.id.llConfigEmpty).setVisibility(empty ? View.VISIBLE : View.GONE);
+        findViewById(R.id.listConfig).setVisibility(empty ? View.GONE : View.VISIBLE);
+        ((TextView) findViewById(R.id.tvConfigTip)).setText(
+                empty ? R.string.dia_config_tip_empty : R.string.dia_config_tip);
     }
 
     /** 右栏二维码：指向本机 9978 的手机配置页（#config 直达配置视图） */
@@ -159,6 +169,7 @@ public class ConfigApiDialog extends BaseDialog {
                     Hawk.put(HawkConfig.API_HISTORY, history);
                     rebuild();
                     adapter.notifyDataSetChanged();
+                    updateEmptyState();
                     Toast.makeText(getContext(), getContext().getString(R.string.dia_config_deleted), Toast.LENGTH_SHORT).show();
                 }
             });
