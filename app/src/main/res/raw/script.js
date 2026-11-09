@@ -164,7 +164,13 @@ $(function () {
     var url = window.location.href;
     var saved = null;
     try { saved = localStorage.getItem('yhg_view'); } catch (e) { }
-    if (url.indexOf('#config') >= 0) switchView('Config');
+    if (url.indexOf('#config') >= 0) {
+        switchView('Config');
+        // #config&adv=1 —— 从外部（文档 / 截图工具）直达时顺手展开高级选项
+        if (url.indexOf('adv=1') >= 0) $('#advBody').addClass('is-open');
+    }
+    else if (url.indexOf('#search') >= 0) switchView('Search');
+    else if (url.indexOf('#push') >= 0) switchView('Push');
     else if (url.indexOf('push.html') > 0) switchView('Push');
     else if (url.indexOf('api.html') > 0 || url.indexOf('all.html') > 0) switchView('Config');
     else if (saved === 'Push' || saved === 'Config' || saved === 'Search') switchView(saved);
