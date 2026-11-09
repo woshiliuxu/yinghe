@@ -70,16 +70,29 @@ public class InputRequestProcess implements RequestProcess {
                         }
                         case "api": {
                             // 手机端配置数据源：真正落盘（旧流程只发事件不改 Hawk，
-                            // 「立即生效」等于没生效）。写入当前项 + 置顶历史，重启拉新配置。
-                            String url = params.get("url") == null ? "" : params.get("url").trim();
-                            if (url.isEmpty()) break;
+                            // 「立即生效」等于没生效）。
+                            // 0.11.8：支持一次粘贴多个（换行 / 逗号 / 分号分隔）：
+                            // 第 1 个设为当前生效，其余全部并入配置列表供 TV 端切换。
+                            String raw = params.get("url") == null ? "" : params.get("url").trim();
+                            if (raw.isEmpty()) break;
+                            ArrayList<String> urls = new ArrayList<>();
+                            for (String p : raw.split("[\\r\\n,;，；]+")) {
+                                String u = p.trim();
+                                if (!u.isEmpty() && !urls.contains(u)) urls.add(u);
+                            }
+                            if (urls.isEmpty()) break;
+                            String first = urls.get(0);
                             String current = Hawk.get(HawkConfig.API_URL, "");
-                            Hawk.put(HawkConfig.API_URL, url);
+                            Hawk.put(HawkConfig.API_URL, first);
                             ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
-                            history.remove(url);
-                            history.add(0, url);
+                            // 倒着插到最前，最终顺序与粘贴顺序一致（第一个在最上）
+                            for (int i = urls.size() - 1; i >= 0; i--) {
+                                String u = urls.get(i);
+                                history.remove(u);
+                                history.add(0, u);
+                            }
                             Hawk.put(HawkConfig.API_HISTORY, history);
-                            if (!url.equals(current)) restartApp();
+                            if (!first.equals(current)) restartApp();
                             break;
                         }
                         case "live": {

@@ -2,8 +2,11 @@ package com.github.tvbox.osc.ui.dialog;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -50,7 +53,7 @@ public class TmdbTokenDialog extends BaseDialog {
         bindState();
     }
 
-    /** 按「配没配」切换两种形态 */
+    /** 按「配没配」切换两种形态：未配置时内容行居中（只有一张码），面板整块收起 */
     private void bindState() {
         String token = Hawk.get(HawkConfig.TMDB_TOKEN, "");
         boolean configured = !TextUtils.isEmpty(token);
@@ -58,6 +61,14 @@ public class TmdbTokenDialog extends BaseDialog {
         findViewById(R.id.llTmdbCard).setVisibility(configured ? View.VISIBLE : View.GONE);
         TextView tip = findViewById(R.id.tvTmdbTip);
         tip.setText(configured ? R.string.dia_tmdb_qr_tip : R.string.dia_tmdb_empty_tip);
+
+        // 未配置：左面板 gone 后若仍靠左，740 宽的弹窗会右重左空 —— 整行居中 + 右栏去掉左边距
+        LinearLayout body = findViewById(R.id.llTmdbBody);
+        LinearLayout right = findViewById(R.id.llTmdbRight);
+        body.setGravity(configured ? Gravity.TOP : Gravity.CENTER_HORIZONTAL);
+        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) right.getLayoutParams();
+        lp.leftMargin = configured ? AutoSizeUtils.mm2px(getContext(), 24) : 0;
+        right.setLayoutParams(lp);
 
         if (!configured) return;
 

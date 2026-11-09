@@ -215,10 +215,10 @@ body {
 
 .adv-row {
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	gap: 4px;
-	height: 52px;
-	padding: 0 6px 0 14px;
+	min-height: 52px;
+	padding: 9px 6px 9px 14px;
 	border-radius: 14px;
 	background: var(--bar);
 	border: 1px solid transparent;
@@ -244,6 +244,67 @@ body {
 }
 
 .adv-row input::placeholder {
+	color: var(--text-3);
+}
+
+/* 多行文本域（0.11.8）：配置地址 / Token 这类长串单行必截断，用户没法核对，
+   一律换多行；word-break: break-all 让超长 token 强制折行而不是横向溢出 */
+.adv-row textarea {
+	flex: 1;
+	min-width: 0;
+	min-height: 34px;
+	border: none;
+	background: transparent;
+	color: var(--text-1);
+	font-family: inherit;
+	font-size: 15px;
+	line-height: 1.45;
+	outline: none;
+	resize: none;
+	overflow-y: auto;
+	word-break: break-all;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.adv-row textarea::placeholder {
+	color: var(--text-3);
+}
+
+.adv-row button {
+	align-self: center;
+}
+
+/* 配置页主输入区：裸放的多行文本域（iOS 原生大搜索栏形态，不是卡片包表单） */
+.search-bar.is-area {
+	height: auto;
+	align-items: flex-start;
+	padding: 12px 12px 12px 14px;
+}
+
+.search-bar.is-area>svg {
+	margin-top: 1px;
+}
+
+.search-bar.is-area textarea {
+	flex: 1;
+	min-width: 0;
+	min-height: 66px;
+	border: none;
+	background: transparent;
+	color: var(--text-1);
+	font-family: inherit;
+	font-size: 15.5px;
+	line-height: 1.5;
+	outline: none;
+	resize: none;
+	overflow-y: auto;
+	word-break: break-all;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.search-bar.is-area textarea::placeholder {
 	color: var(--text-3);
 }
 

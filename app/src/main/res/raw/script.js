@@ -23,14 +23,19 @@ function toggleAdv() {
 
 /* ---------- 动作 ---------- */
 
-function doAction(action, kv) {
+function doAction(action, kv, okMsg) {
     kv['do'] = action;
     $.post('/action', kv, function (data) {
-        okToast('已发送到电视');
+        okToast(okMsg || '已发送到电视');
     }).fail(function () {
         warnToast('发送失败，请检查连接');
     });
     return false;
+}
+
+/* 文本域取单值：URL / Token 里不能有空白，多行粘贴时把换行也一并吃掉 */
+function oneLine(sel) {
+    return ($(sel).val() || '').replace(/\s+/g, '');
 }
 
 function search() {
@@ -82,27 +87,40 @@ function renderHistory() {
     });
 }
 
+/* 数据源：支持一次粘贴多个（换行 / 逗号 / 分号分隔，去重保序）
+   第 1 个设为当前生效，其余全部进电视端的配置列表供切换 */
 function api() {
-    if (!$('#diy_api_url').val()) return warnToast('先粘贴配置地址');
-    doAction('api', { url: $('#diy_api_url').val() });
+    var raw = ($('#diy_api_url').val() || '').trim();
+    if (!raw) return warnToast('先粘贴配置地址');
+    var list = [];
+    raw.split(/[\n,;，；]+/).forEach(function (s) {
+        s = s.trim();
+        if (s && list.indexOf(s) < 0) list.push(s);
+    });
+    if (!list.length) return warnToast('没有识别到有效的配置地址');
+    doAction('api', { url: list.join('\n') },
+        list.length > 1
+            ? '已保存 ' + list.length + ' 个数据源，当前使用第 1 个'
+            : '配置已保存，电视正在重启');
+    $('#diy_api_url').val('').closest('.search-bar').removeClass('has-text');
 }
 
 function live() {
-    doAction('live', { url: $('#diy_live_url').val() });
+    doAction('live', { url: oneLine('#diy_live_url') }, '直播源已保存，电视正在重启');
 }
 
 function epg() {
-    doAction('epg', { url: $('#diy_epg_url').val() });
+    doAction('epg', { url: oneLine('#diy_epg_url') }, 'EPG 已保存，电视正在重启');
 }
 
 function proxys() {
-    doAction('proxys', { url: $('#diy_proxy_server').val() });
+    doAction('proxys', { url: oneLine('#diy_proxy_server') }, '代理已保存，电视正在重启');
 }
 
 function tmdbToken() {
-    var token = $('#diy_tmdb_token').val().trim();
-    doAction('tmdb', { token: token });
-    if (!token) okToast('已清空，TMDB 大图已关闭');
+    var token = oneLine('#diy_tmdb_token');
+    doAction('tmdb', { token: token }, token ? 'TMDB 密钥已保存' : '已清空，TMDB 大图已关闭');
+    $('#diy_tmdb_token').val('');
 }
 
 function push() {
@@ -152,20 +170,21 @@ $(function () {
     else if (saved === 'Push' || saved === 'Config' || saved === 'Search') switchView(saved);
     else switchView('Config');
 
-    // 输入非空时显示清空按钮
-    $('.search-bar input').on('input', function () {
+    // 输入非空时显示清空按钮（多行文本域同样适用）
+    $('.search-bar input, .search-bar textarea').on('input', function () {
         $(this).closest('.search-bar').toggleClass('has-text', !!this.value);
     });
 
-    // 回车提交
+    // 多行文本域里 Enter = 换行（批量粘贴多个源要用），提交走按钮；
+    // 想键盘直接提交用 Ctrl / ⌘ + Enter
     $('#diy_api_url').on('keydown', function (e) {
-        if (e.key === 'Enter') { e.preventDefault(); api(); }
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); api(); }
     });
     $('#search_key_word').on('keydown', function (e) {
         if (e.key === 'Enter') { e.preventDefault(); search(); }
     });
     $('#push_url').on('keydown', function (e) {
-        if (e.key === 'Enter') { e.preventDefault(); push(); }
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); push(); }
     });
 
     // 搜索历史：初始渲染 + 清空

@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- TMDB 密钥弹窗（0.11.7：双状态 + 等高对齐）。
-     未配置 = 只有码（右栏铺满居中）；
-     已配置 = 左栏状态卡（已配置徽标 + 掩码 Token + 配置日期），右栏缩为更换入口。
-     对齐规则：状态卡与二维码都是 vs_170 高、同顶对齐，左右两栏底边齐平；
-     弹窗高度两态一致，「TMDB 密钥」标题不位移。
+<!-- TMDB 密钥弹窗（0.11.8：方案 A —— 左信息面板 + 右码，与配置接口弹窗同宽同向）。
+     已配置 = 左侧浅灰面板装三层信息（徽标行 / 白底等宽掩码 / 时间+说明），右侧二维码；
+     未配置 = 面板整块 gone，内容行改居中，只剩一张码 + 一句说明。
+     对齐规则：面板与二维码同为 vs_170 高、同顶，底边齐平，弹窗高度两态一致。
      遥控器没法粘贴长 Token，TV 端始终不放输入框。 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/vs_520"
+    android:layout_width="@dimen/vs_740"
     android:layout_height="wrap_content"
     android:background="@drawable/shape_dialog_bg_main"
     android:orientation="vertical"
-    android:paddingLeft="@dimen/vs_24"
-    android:paddingTop="@dimen/vs_20"
-    android:paddingRight="@dimen/vs_24"
-    android:paddingBottom="@dimen/vs_20">
+    android:paddingLeft="@dimen/vs_30"
+    android:paddingTop="@dimen/vs_24"
+    android:paddingRight="@dimen/vs_30"
+    android:paddingBottom="@dimen/vs_24">
 
     <TextView
-        android:id="@+id/tvTmdbTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/dia_tmdb_title"
         android:textColor="@color/dialog_text_main"
-        android:textSize="@dimen/ts_20"
+        android:textSize="@dimen/ts_26"
         android:textStyle="bold" />
 
     <LinearLayout
@@ -32,16 +30,22 @@
         android:gravity="top"
         android:orientation="horizontal">
 
-        <!-- 已配置状态卡：与右侧二维码同高（170）、同顶；未配置时整块 gone -->
+        <!-- 信息面板：与右侧二维码同高（170）、同顶；未配置时整块 gone -->
         <LinearLayout
             android:id="@+id/llTmdbCard"
-            android:layout_width="@dimen/vs_240"
+            android:layout_width="@dimen/vs_0"
             android:layout_height="@dimen/vs_170"
-            android:layout_marginRight="@dimen/vs_24"
+            android:layout_weight="1"
+            android:background="@drawable/shape_panel_soft"
             android:gravity="center_vertical"
             android:orientation="vertical"
+            android:paddingLeft="@dimen/vs_20"
+            android:paddingTop="@dimen/vs_16"
+            android:paddingRight="@dimen/vs_20"
+            android:paddingBottom="@dimen/vs_16"
             android:visibility="gone">
 
+            <!-- 第一层：状态徽标 -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -68,45 +72,64 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/vs_8"
+                    android:background="@drawable/shape_config_badge"
+                    android:paddingLeft="@dimen/vs_8"
+                    android:paddingTop="@dimen/vs_2"
+                    android:paddingRight="@dimen/vs_8"
+                    android:paddingBottom="@dimen/vs_2"
                     android:text="@string/dia_tmdb_type_v4"
                     android:textColor="@color/dialog_text_sub"
-                    android:textSize="@dimen/ts_12" />
+                    android:textSize="@dimen/ts_11" />
             </LinearLayout>
 
+            <!-- 第二层：掩码 Token（白底虚线 + 等宽字，像一张凭据） -->
             <TextView
                 android:id="@+id/tvTmdbMasked"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/vs_12"
-                android:ellipsize="middle"
+                android:layout_marginTop="@dimen/vs_14"
+                android:background="@drawable/shape_token_box"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:paddingLeft="@dimen/vs_12"
+                android:paddingTop="@dimen/vs_8"
+                android:paddingRight="@dimen/vs_12"
+                android:paddingBottom="@dimen/vs_8"
                 android:singleLine="true"
                 android:textColor="@color/dialog_text_main"
-                android:textSize="@dimen/ts_15" />
+                android:textSize="@dimen/ts_13" />
 
-            <TextView
-                android:id="@+id/tvTmdbTime"
+            <!-- 第三层：时间 + 操作提示 -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/vs_6"
-                android:textColor="@color/dialog_hint"
-                android:textSize="@dimen/ts_11"
-                android:visibility="gone" />
+                android:layout_marginTop="@dimen/vs_10"
+                android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/vs_16"
-                android:lineSpacingExtra="3mm"
-                android:text="@string/dia_tmdb_change_tip"
-                android:textColor="@color/dialog_text_sub"
-                android:textSize="@dimen/ts_12" />
+                <TextView
+                    android:id="@+id/tvTmdbTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/dialog_hint"
+                    android:textSize="@dimen/ts_11" />
+
+                <TextView
+                    android:layout_width="@dimen/vs_0"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:text="@string/dia_tmdb_change_tip"
+                    android:textColor="@color/dialog_hint"
+                    android:textSize="@dimen/ts_11" />
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- 右栏铺满剩余宽度并居中：未配置时就是一张居中的码，已配置时靠右排 -->
+        <!-- 右栏：二维码（170，与左面板等高）+ 说明 + 地址 -->
         <LinearLayout
-            android:layout_width="@dimen/vs_0"
+            android:id="@+id/llTmdbRight"
+            android:layout_width="@dimen/vs_180"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_marginLeft="@dimen/vs_24"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 

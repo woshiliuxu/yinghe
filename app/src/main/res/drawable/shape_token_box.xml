@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 掩码 Token 展示块：白底 + 虚线描边，等宽字体放在这里，像一张「凭据」 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#FFFFFF" />
+    <stroke
+        android:width="1mm"
+        android:color="#99888680"
+        android:dashWidth="4mm"
+        android:dashGap="3mm" />
+    <corners android:radius="8mm" />
+</shape>

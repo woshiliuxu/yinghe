@@ -238,6 +238,7 @@
     <string name="dia_config_in_use">使用中</string>
     <string name="dia_config_del_cur">使用中的配置不能删除</string>
     <string name="dia_config_deleted">已删除</string>
+    <string name="dia_config_tip_list">共 %1$d 个数据源 · 点击行切换，行内右移可删除</string>
     <string name="dia_config_tip_empty">配置在手机端添加，添加后这里会出现可切换的配置列表</string>
     <string name="dia_config_empty_title">还没有添加数据源</string>
     <string name="dia_config_empty_step1">1 · 手机扫描右侧二维码</string>

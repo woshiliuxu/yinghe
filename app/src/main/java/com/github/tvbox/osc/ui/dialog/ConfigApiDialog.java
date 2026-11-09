@@ -92,8 +92,16 @@ public class ConfigApiDialog extends BaseDialog {
         boolean empty = configs.isEmpty();
         findViewById(R.id.llConfigEmpty).setVisibility(empty ? View.VISIBLE : View.GONE);
         findViewById(R.id.listConfig).setVisibility(empty ? View.GONE : View.VISIBLE);
-        ((TextView) findViewById(R.id.tvConfigTip)).setText(
-                empty ? R.string.dia_config_tip_empty : R.string.dia_config_tip);
+
+        TextView tip = findViewById(R.id.tvConfigTip);
+        if (empty) {
+            tip.setText(R.string.dia_config_tip_empty);
+        } else {
+            // 带上条数：用户一眼知道有几个源、以及下面还能不能滚
+            tip.setText(getContext().getString(R.string.dia_config_tip_list, configs.size()));
+        }
+        // 可视区恰好 3 行（3×50 + 2×8 = 166 < 170），超过 3 个才提示可滚
+        findViewById(R.id.vConfigFade).setVisibility(configs.size() > 3 ? View.VISIBLE : View.GONE);
     }
 
     /** 右栏二维码：指向本机 9978 的手机配置页（#config 直达配置视图） */

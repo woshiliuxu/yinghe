@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TMDB 状态面板（0.11.8 方案 A）：比纸面深一档的暖灰圆角面板，
+     把状态信息装进容器，避免裸文字浮在纸面上左轻右重 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#ECE9E2" />
+    <corners android:radius="12mm" />
+</shape>

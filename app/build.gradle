@@ -4,8 +4,8 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'com.yanzhenjie.andserver'
 
 // 版本号唯一来源：改这里，tag 与 APK 元数据保持一致（发版流程见根目录 RELEASES.md）
-def appVerName = "0.11.7"
-def appVerCode = 117
+def appVerName = "0.11.8"
+def appVerCode = 118
 
 android {
     compileSdk 34
