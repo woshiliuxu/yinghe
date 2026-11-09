@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 首页大图层的压暗遮罩：底部一条重渐变给文字垫底，
+     顶部一条轻渐变给右上角的切换器小图垫底。
+     两层都是独立渐变形状，叠在一起比一张大渐变可控。 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:gravity="bottom">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="90"
+                android:startColor="#C506080C"
+                android:endColor="#0006080C" />
+        </shape>
+    </item>
+    <item android:gravity="top" android:height="150dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="90"
+                android:startColor="#0006080C"
+                android:endColor="#6B06080C" />
+        </shape>
+    </item>
+</layer-list>

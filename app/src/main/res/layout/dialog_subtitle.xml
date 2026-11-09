@@ -26,10 +26,6 @@
                 android:gravity="center"
                 android:lineSpacingExtra="@dimen/ts_40"
                 android:padding="@dimen/vs_20"
-                android:shadowColor="@color/color_FF000000"
-                android:shadowDx="0"
-                android:shadowDy="0"
-                android:shadowRadius="5"
                 android:singleLine="true"
                 android:textColor="@color/dialog_text_main"
                 android:textSize="@dimen/ts_26"
@@ -62,7 +58,7 @@
                     android:gravity="center"
                     android:padding="@dimen/vs_10"
                     android:text="Internal"
-                    android:textColor="@color/dialog_text_main"
+                    android:textColor="@color/dialog_row_text"
                     android:textSize="@dimen/ts_20" />
 
                 <TextView
@@ -79,7 +75,7 @@
                     android:gravity="center"
                     android:padding="@dimen/vs_10"
                     android:text="Local"
-                    android:textColor="@color/dialog_text_main"
+                    android:textColor="@color/dialog_row_text"
                     android:textSize="@dimen/ts_20" />
 
                 <TextView
@@ -96,7 +92,7 @@
                     android:gravity="center"
                     android:padding="@dimen/vs_10"
                     android:text="Remote"
-                    android:textColor="@color/dialog_text_main"
+                    android:textColor="@color/dialog_row_text"
                     android:textSize="@dimen/ts_20" />
             </LinearLayout>
 
@@ -121,10 +117,6 @@
                     android:layout_marginRight="@dimen/vs_10"
                     android:gravity="center"
                     android:padding="@dimen/vs_10"
-                    android:shadowColor="@color/color_FF000000"
-                    android:shadowDx="0"
-                    android:shadowDy="0"
-                    android:shadowRadius="2"
                     android:text="@string/sub_size"
                     android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_20"
@@ -148,10 +140,6 @@
                     android:layout_marginLeft="@dimen/vs_40"
                     android:layout_marginRight="@dimen/vs_40"
                     android:gravity="center"
-                    android:shadowColor="@color/color_FF000000"
-                    android:shadowDx="0"
-                    android:shadowDy="0"
-                    android:shadowRadius="2"
                     android:text="16"
                     android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_24"
@@ -190,10 +178,6 @@
                     android:layout_marginRight="@dimen/vs_10"
                     android:gravity="center"
                     android:padding="@dimen/vs_10"
-                    android:shadowColor="@color/color_FF000000"
-                    android:shadowDx="0"
-                    android:shadowDy="0"
-                    android:shadowRadius="2"
                     android:text="@string/sub_style"
                     android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_20"
@@ -209,7 +193,6 @@
                     android:padding="@dimen/vs_8"
                     app:srcCompat="@drawable/scrollviewleft" />
 
-                <!--android:shadowColor="@color/color_FF000000"-->
                 <com.github.tvbox.osc.subtitle.widget.SimpleSubtitleView
                     android:id="@+id/subtitleStyleText"
                     android:layout_width="@dimen/vs_95"
@@ -256,10 +239,6 @@
                     android:layout_marginRight="@dimen/vs_10"
                     android:gravity="center"
                     android:padding="@dimen/vs_10"
-                    android:shadowColor="@color/color_FF000000"
-                    android:shadowDx="0"
-                    android:shadowDy="0"
-                    android:shadowRadius="2"
                     android:text="@string/sub_delay"
                     android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_20"
@@ -283,10 +262,6 @@
                     android:layout_marginLeft="@dimen/vs_40"
                     android:layout_marginRight="@dimen/vs_40"
                     android:gravity="center"
-                    android:shadowColor="@color/color_FF000000"
-                    android:shadowDx="0"
-                    android:shadowDy="0"
-                    android:shadowRadius="2"
                     android:text="16"
                     android:textColor="@color/dialog_text_main"
                     android:textSize="@dimen/ts_24"

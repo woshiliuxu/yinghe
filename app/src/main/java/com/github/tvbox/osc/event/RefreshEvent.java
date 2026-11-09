@@ -27,6 +27,7 @@ public class RefreshEvent {
     public static final int TYPE_FILTER_CHANGE = 16;
     public static final int TYPE_REFRESH_NOTIFY = 17;
     public static final int TYPE_SET_DANMU_SETTINGS = 18;
+    public static final int TYPE_TMDB_CHANGE = 19; // 手机端改了 TMDB 密钥，首页重拉大图
     public int type;
     public Object obj;
 

@@ -1,12 +1,12 @@
 package com.github.tvbox.osc.ui.dialog;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,42 +14,45 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.tvbox.osc.R;
+import com.github.tvbox.osc.server.ControlManager;
+import com.github.tvbox.osc.ui.tv.QRCodeGen;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
 import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
 import com.orhanobut.hawk.Hawk;
 
-import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
 /**
- * 配置接口管理弹窗（2026-11-05）
+ * 配置接口管理弹窗（0.11.5：手机优先）。
  * 影视仓式多配置：本地存一份配置列表（API_URL 为当前项，API_HISTORY 为其余），
- * 点条目即切换（写回 API_URL 并置顶历史，重启 App 后由 SplashActivity 重新拉取生效），
- * 条目右侧垃圾桶删除，底部「新增配置」走原 ApiDialog 输入表单。
+ * 点条目即切换（写回 API_URL 并置顶历史，重启 App 后由 SplashActivity 重新拉取生效）。
+ *
+ * 右侧二维码指向本机 9978 配置页：新增配置一律手机扫码搞定，
+ * TV 端不再套第二层输入弹窗（两层弹窗 + 遥控器打字都是浪费时间）。
+ *
+ * 焦点：行上按右进垃圾桶（TvRecyclerView 会吞横向键，必须在 border 回调里手动交），
+ * 垃圾桶上按左回行，上下键在行间正常移动。
  */
 public class ConfigApiDialog extends BaseDialog {
     private final ArrayList<String> configs = new ArrayList<>();
     private String current;
     private ConfigAdapter adapter;
 
-    /** 新增配置弹窗：监听 RefreshEvent 同步输入框内容（沿用 ModelSettingFragment 的老模式） */
-    private ApiDialog addDialog;
-
     public ConfigApiDialog(@NonNull @NotNull Context context) {
         super(context);
         setContentView(R.layout.dialog_config_api);
         setCanceledOnTouchOutside(true);
-        // 与 ApiConfig.loadConfig 的回退一致：没配置过就用内置默认源，保证列表永远有「当前项」
-        current = Hawk.get(HawkConfig.API_URL, getContext().getString(R.string.app_source));
+        // 纯壳原则：出厂不带任何默认源，没配置过 current 就是空，列表为空时右栏二维码就是唯一的路
+        current = Hawk.get(HawkConfig.API_URL, "");
 
         rebuild();
         adapter = new ConfigAdapter();
 
-        TvRecyclerView list = findViewById(R.id.listConfig);
+        final TvRecyclerView list = findViewById(R.id.listConfig);
         list.setLayoutManager(new V7LinearLayoutManager(getContext()));
         list.setAdapter(adapter);
         list.setOnItemListener(new com.owen.tvrecyclerview.widget.SimpleOnItemListener() {
@@ -60,48 +63,47 @@ public class ConfigApiDialog extends BaseDialog {
                 switchTo(configs.get(position));
             }
         });
-
-        findViewById(R.id.btnAddConfig).setOnClickListener(new View.OnClickListener() {
+        // TvRecyclerView 对列表外的横向键是吞掉的（用户反馈「垃圾桶怎么都聚焦不上」），
+        // 行上按右 = 手动把焦点交给当前行的垃圾桶；垃圾桶上按左 = 交还行
+        list.setOnInBorderKeyEventListener(new TvRecyclerView.OnInBorderKeyEventListener() {
             @Override
-            public void onClick(View v) {
-                FastClickCheckUtil.check(v);
-                addDialog = new ApiDialog(getContext());
-                EventBus.getDefault().register(addDialog);
-                addDialog.setOnListener(new ApiDialog.OnListener() {
-                    @Override
-                    public void onchange(String api) {
-                        // ApiDialog 只负责把新地址写进历史，正式生效必须写 API_URL（原设置页就是在这儿写的）
-                        if (!api.isEmpty()) {
-                            Hawk.put(HawkConfig.API_URL, api);
-                        }
-                        dismiss();
-                        restartApp();
-                    }
-                });
-                addDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        EventBus.getDefault().unregister(addDialog);
-                        addDialog = null;
-                    }
-                });
-                addDialog.show();
+            public boolean onInBorderKeyEvent(int direction, View view) {
+                View row = list.getFocusedChild();
+                if (row == null) return false;
+                View trash = row.findViewById(R.id.btnConfigDel);
+                if (direction == View.FOCUS_RIGHT && trash != null && trash.isFocusable()) {
+                    trash.requestFocus();
+                    return true;
+                }
+                if (direction == View.FOCUS_LEFT && trash != null && trash.hasFocus()) {
+                    row.requestFocus();
+                    return true;
+                }
+                return false;
             }
         });
+
+        refreshQRCode();
     }
 
-    /** 当前项置顶，其余按历史顺序；空列表也允许（只显示新增按钮） */
+    /** 右栏二维码：指向本机 9978 的手机配置页（#config 直达配置视图） */
+    private void refreshQRCode() {
+        String address = ControlManager.get().getAddress(false) + "/#config";
+        int side = me.jessyan.autosize.utils.AutoSizeUtils.mm2px(getContext(), 160);
+        ((ImageView) findViewById(R.id.ivConfigQR)).setImageBitmap(
+                QRCodeGen.generateBitmap(address, side, side));
+        ((TextView) findViewById(R.id.tvConfigAddr)).setText(address);
+    }
+
+    /** 当前项置顶，其余按历史顺序；空列表也允许（右栏二维码始终在，扫码即添加） */
     private void rebuild() {
         configs.clear();
-        current = Hawk.get(HawkConfig.API_URL, getContext().getString(R.string.app_source));
+        current = Hawk.get(HawkConfig.API_URL, "");
         if (!current.isEmpty()) configs.add(current);
         ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
         for (String url : history) {
             if (!url.isEmpty() && !configs.contains(url)) configs.add(url);
         }
-        // 内置默认源永远可回退：没配置过或被清掉时也能一键切回去
-        String def = getContext().getString(R.string.app_source);
-        if (!def.isEmpty() && !configs.contains(def)) configs.add(def);
     }
 
     private void switchTo(String url) {

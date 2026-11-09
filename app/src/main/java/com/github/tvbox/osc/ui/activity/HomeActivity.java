@@ -19,6 +19,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.View;
@@ -36,6 +37,8 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import android.graphics.Rect;
+
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -52,8 +55,10 @@ import com.github.tvbox.osc.event.HomeFocusEvent;
 import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.ui.adapter.HomePageAdapter;
+import com.github.tvbox.osc.ui.adapter.HeroAdapter;
 import com.github.tvbox.osc.ui.adapter.SelectDialogAdapter;
 import com.github.tvbox.osc.ui.adapter.SortAdapter;
+import com.github.tvbox.osc.ui.dialog.ConfigApiDialog;
 import com.github.tvbox.osc.ui.dialog.RailMoreDialog;
 import com.github.tvbox.osc.ui.dialog.SelectDialog;
 import com.github.tvbox.osc.ui.dialog.TipDialog;
@@ -76,6 +81,8 @@ import com.github.tvbox.osc.util.BlurUtil;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.HomeCache;
 import com.github.tvbox.osc.util.ImgUtil;
+import com.github.tvbox.osc.util.TmdbApi;
+import com.github.tvbox.osc.bean.TmdbItem;
 import com.google.gson.reflect.TypeToken;
 import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.MD5;
@@ -133,6 +140,36 @@ public class HomeActivity extends BaseActivity {
     private TextView tvDate;
     private TvRecyclerView mGridView;
     private NoScrollViewPager mViewPager;
+
+    // ── TMDB 大图层（方案 A 影院首页）──
+    private ImageView bgHero;
+    private View heroScrim;
+    private View heroInfo;
+    private TextView tvHeroTitle;
+    private TextView tvHeroRate;
+    private TextView tvHeroMeta;
+    private TextView tvHeroOverview;
+    private TvRecyclerView heroSwitcher;
+    private HeroAdapter heroAdapter;
+    /** hero 数据是否已经回调过（成功或失败）。决定首屏焦点给谁 */
+    private boolean heroPending = true;
+    /** 启动时记下当时的 token，从设置回来如果换了 key 才重拉 */
+    private String heroLastToken = null;
+    /** 用户主动离开过大图后置位，TMDB 数据晚到时不再自动弹回大图 */
+    private boolean heroDismissed = false;
+    /** 用户按过遥控器才算真交互；启动期的程序化抢焦点不许触发大图退场 */
+    private boolean userInteracted = false;
+    /** 当前大图在切换器里的下标，从海报墙按上来时回到这张 */
+    private int heroLastPos = 0;
+    /** 当前片的多张剧照轮播：8 秒一张（Apple TV 节奏），按键即重置计时 */
+    private static final long HERO_TICK_MS = 8000;
+    private final Handler heroTickerHandler = new Handler(Looper.getMainLooper());
+    private Runnable heroTicker;
+    private int heroImgIdx = 0;
+    /** 大图层当前是否可见 */
+    private boolean heroShown = false;
+    /** 当前大图对应的 backdrop 地址，防止同一张图重复解码 */
+    private String heroLastUrl;
     private SourceViewModel sourceViewModel;
     private SortAdapter sortAdapter;
     private HomePageAdapter pageAdapter;
@@ -188,6 +225,9 @@ public class HomeActivity extends BaseActivity {
         // 配置就位后，先用缓存把分类 tab 立起来，让首屏立刻有东西
         restoreSortFromCache();
         initData();
+        // TMDB 周榜（首页大图轮播）：缓存先铺、网络后刷
+        heroLastToken = Hawk.get(HawkConfig.TMDB_TOKEN, "");
+        loadHero();
     }
 
     // takagen99: Added to allow read string
@@ -220,6 +260,69 @@ public class HomeActivity extends BaseActivity {
         this.mGridView = findViewById(R.id.mGridViewCategory);
         this.mViewPager = findViewById(R.id.mViewPager);
 
+        // ── TMDB 大图层 ──
+        this.bgHero = findViewById(R.id.bgHero);
+        this.heroScrim = findViewById(R.id.heroScrim);
+        this.heroInfo = findViewById(R.id.heroInfo);
+        this.tvHeroTitle = findViewById(R.id.tvHeroTitle);
+        this.tvHeroRate = findViewById(R.id.tvHeroRate);
+        this.tvHeroMeta = findViewById(R.id.tvHeroMeta);
+        this.tvHeroOverview = findViewById(R.id.tvHeroOverview);
+        this.heroSwitcher = findViewById(R.id.heroSwitcher);
+        this.heroAdapter = new HeroAdapter();
+        // 焦点落到哪张小图就换哪张大图（TvRecyclerView 的 onItemSelected 内部移动不触发，靠 item 焦点监听）
+        heroAdapter.setListener(new HeroAdapter.Listener() {
+            @Override
+            public void onHeroSelected(int position) {
+                showHero(position);
+            }
+
+            @Override
+            public void onHeroClick(int position) {
+                FastClickCheckUtil.check(heroSwitcher);
+                TmdbItem item = heroAdapter.get(position);
+                if (item == null) return;
+                // TMDB 条目没有站内 id，和豆瓣一样：拿片名去各站点搜
+                Bundle bundle = new Bundle();
+                bundle.putString("title", item.name);
+                jumpActivity(SearchActivity.class, bundle);
+            }
+        });
+        // 缩略图之间的纵向间距（铁律：间距走 ItemDecoration，不写进 item 的 margin）
+        final int heroGap = AutoSizeUtils.mm2px(this, 10);
+        heroSwitcher.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view,
+                                       @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                outRect.bottom = heroGap;
+            }
+        });
+        heroSwitcher.setLayoutManager(new V7LinearLayoutManager(this.mContext, 1, false));
+        heroSwitcher.setAdapter(heroAdapter);
+        heroSwitcher.setOnInBorderKeyEventListener(new TvRecyclerView.OnInBorderKeyEventListener() {
+            @Override
+            public boolean onInBorderKeyEvent(int direction, View view) {
+                // 竖排贴右缘：往上、往右都是屏幕死角，就地留住
+                if (direction == View.FOCUS_UP || direction == View.FOCUS_RIGHT) return true;
+                // 左 / 下 = 回海报墙：大图在场时 contentLayout 是 INVISIBLE，
+                // 系统焦点搜索会跳过隐藏视图，必须自己淡出并落焦点到分类胶囊
+                if (direction == View.FOCUS_LEFT || direction == View.FOCUS_DOWN) {
+                    if (heroShown) fadeOutHero();
+                    mGridView.post(() -> {
+                        View firstChild = Objects.requireNonNull(mGridView.getLayoutManager()).findViewByPosition(0);
+                        if (firstChild != null) {
+                            mGridView.setSelectedPosition(0);
+                            firstChild.requestFocus();
+                        } else {
+                            mGridView.requestFocus();
+                        }
+                    });
+                    return true;
+                }
+                return false;
+            }
+        });
+
         // 记下折叠态的基准，展开时在它上面加位移（XML 里改过数值这里会自动跟上）
         railBaseWidth = leftRail.getLayoutParams().width;
         contentBaseLeft = ((ViewGroup.MarginLayoutParams) contentLayout.getLayoutParams()).getMarginStart();
@@ -231,6 +334,11 @@ public class HomeActivity extends BaseActivity {
         sortAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
+                // 首屏焦点让给 TMDB 大图切换器（heroPending = 数据还没回来）；
+                // hero 正在大图态（heroShown）时也不抢——配置加载完会再 notify 一次，
+                // 之前就是这里在 hero 上屏后又把焦点塞回海报墙，触发了淡出把大图盖掉。
+                // hero 挂了会在 loadHero 失败分支里把焦点补回这里
+                if (heroPending || heroShown) return;
                 mGridView.post(() -> {
                     View firstChild = Objects.requireNonNull(mGridView.getLayoutManager()).findViewByPosition(0);
                     if (firstChild != null) {
@@ -257,6 +365,8 @@ public class HomeActivity extends BaseActivity {
                     HomeActivity.this.currentView = view;
                     HomeActivity.this.isDownOrUp = false;
                     HomeActivity.this.sortChange = true;
+                    // 焦点进了分类胶囊：大图退场，露出下面的模糊玻璃底
+                    fadeOutHero();
                     view.animate().scaleX(1.06f).scaleY(1.06f).setInterpolator(new BounceInterpolator()).setDuration(150).start();
                     TextView textView = view.findViewById(R.id.tvTitle);
                     textView.getPaint().setFakeBoldText(true);
@@ -299,6 +409,18 @@ public class HomeActivity extends BaseActivity {
         this.mGridView.setOnInBorderKeyEventListener(new TvRecyclerView.OnInBorderKeyEventListener() {
             public boolean onInBorderKeyEvent(int direction, View view) {
                 if (direction == View.FOCUS_UP) {
+                    // 上面是 TMDB 大图切换器：有数据就上去，且回到离开时的那张
+                    if (heroAdapter != null && heroAdapter.size() > 0) {
+                        int last = Math.min(Math.max(heroLastPos, 0), heroAdapter.size() - 1);
+                        heroSwitcher.setSelectedPosition(last);
+                        View lastChild = Objects.requireNonNull(heroSwitcher.getLayoutManager()).findViewByPosition(last);
+                        if (lastChild != null) {
+                            lastChild.requestFocus();
+                        } else {
+                            heroSwitcher.requestFocus();
+                        }
+                        return true;
+                    }
                     BaseLazyFragment baseLazyFragment = fragments.get(sortFocused);
                     if ((baseLazyFragment instanceof GridFragment)) {// 弹出筛选
                         ((GridFragment) baseLazyFragment).forceRefresh();
@@ -411,6 +533,14 @@ public class HomeActivity extends BaseActivity {
                 jumpActivity(PushActivity.class);
             }
         });
+
+        // 左栏任一图标拿到焦点：大图退场，回到模糊玻璃底
+        View[] railBtns = {tvFind, tvHistory, tvHome, tvFav, tvPush, tvPerson};
+        for (View railBtn : railBtns) {
+            railBtn.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) fadeOutHero();
+            });
+        }
 
         // Button : Date >> Go into Android Date Settings --------------
         tvDate.setOnClickListener(new View.OnClickListener() {
@@ -625,7 +755,9 @@ public class HomeActivity extends BaseActivity {
         // 网络状态不再画在左栏底部（底部只留「个人」），入口收进「个人」菜单。
         // 2026 重设计：左侧导航的图标固定，不再随“网格/列表”开关换图
 
-        mGridView.requestFocus();
+        // TMDB 大图在场时（heroShown）首屏是切换器的，别把焦点塞回海报墙
+        // —— 之前就是配置加载完这里把焦点抢走，触发了大图淡出
+        if (userInteracted && !heroShown) mGridView.requestFocus();
 
         if (dataInitOk && jarInitOk) {
             sourceViewModel.getSort(ApiConfig.get().getHomeSourceBean().getKey());
@@ -729,6 +861,18 @@ public class HomeActivity extends BaseActivity {
                             dataInitOk = true;
                             jarInitOk = true;
                             initData();
+                        }
+                    });
+                    return;
+                }
+                // 纯壳原则：出厂不带任何默认源。API_URL 为空说明用户还没配置过，
+                // 不弹「重试」死胡同，直接打开扫码配置面板（手机端添加，切完自动重启）
+                if (Hawk.get(HawkConfig.API_URL, "").isEmpty()) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            showLoading();
+                            new ConfigApiDialog(HomeActivity.this).show();
                         }
                     });
                     return;
@@ -939,6 +1083,13 @@ public class HomeActivity extends BaseActivity {
         if (tvFind != null) tvFind.setVisibility(View.VISIBLE);
         if (tvPerson != null) tvPerson.setVisibility(View.VISIBLE);
         mHandler.post(mRunnable);
+
+        // TMDB 密钥可能在设置里换过：换了就从设置页回来时重拉大图
+        String token = Hawk.get(HawkConfig.TMDB_TOKEN, "");
+        if (!token.equals(heroLastToken)) {
+            heroLastToken = token;
+            if (heroAdapter != null && heroAdapter.getItemCount() > 0) loadHero();
+        }
     }
 
     @Override
@@ -949,6 +1100,12 @@ public class HomeActivity extends BaseActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void refresh(RefreshEvent event) {
+        if (event.type == RefreshEvent.TYPE_TMDB_CHANGE) {
+            // 手机端改了密钥：缓存已清，直接重拉（heroLastToken 同步，防止 onResume 再拉一次）
+            heroLastToken = Hawk.get(HawkConfig.TMDB_TOKEN, "");
+            loadHero();
+            return;
+        }
         if (event.type == RefreshEvent.TYPE_PUSH_URL) {
             if (ApiConfig.get().getSource("push_agent") != null) {
                 Intent newIntent = new Intent(mContext, DetailActivity.class);
@@ -1015,6 +1172,187 @@ public class HomeActivity extends BaseActivity {
                 });
     }
 
+    // ── TMDB 大图层 ─────────────────────────────────────────────
+
+    /** 拉 TMDB 周榜：成功 → 铺切换器 + 首屏焦点交给它；失败 → 焦点还回分类胶囊 */
+    private void loadHero() {
+        TmdbApi.load(new TmdbApi.Callback() {
+            @Override
+            public void onResult(List<TmdbItem> list, boolean fromCache) {
+                if (list == null || list.isEmpty()) {
+                    if (!fromCache) {
+                        // TMDB 挂了：hero 层不出现，首屏焦点还给分类胶囊（旧行为）
+                        heroPending = false;
+                        mGridView.post(() -> {
+                            View firstChild = Objects.requireNonNull(mGridView.getLayoutManager()).findViewByPosition(0);
+                            if (firstChild != null && !mGridView.hasFocus()) {
+                                mGridView.setSelectedPosition(0);
+                                firstChild.requestFocus();
+                            }
+                        });
+                    }
+                    return;
+                }
+                heroAdapter.setData(list);
+                heroPending = false;
+                if ((!fromCache || !heroShown) && !heroDismissed) showHero(0);
+                // 首屏焦点交给切换器第一张。能走到这里说明 heroShown 还是 true：
+                // 用户主动按方向键离开会先触发 fadeOutHero（heroShown=false）跳过抢焦，
+                // 剩下的情况（initData 等程序化抢焦点，焦点滞留在被隐藏的内容层或左栏）都拉回切换器
+                Runnable grabFocus = () -> {
+                    if (!heroShown || heroDismissed || heroSwitcher.hasFocus()) return;
+                    heroSwitcher.setSelectedPosition(0);
+                    View first = Objects.requireNonNull(heroSwitcher.getLayoutManager()).findViewByPosition(0);
+                    if (first != null) first.requestFocus();
+                };
+                mGridView.post(grabFocus);
+                mHandler.postDelayed(grabFocus, 800);
+            }
+        });
+    }
+
+    /**
+     * 焦点落到某张小图：背景换 w1280 原图（不模糊），左下信息跟着换。
+     * 缓存先铺过一次的话，网络回来同一部片不再重解码 —— heroLastShown 拦住。
+     */
+    private void showHero(int position) {
+        TmdbItem item = heroAdapter.get(position);
+        if (item == null || item.backdrop == null || item.backdrop.isEmpty()) return;
+        boolean same = item.backdrop.equals(heroLastUrl);
+        heroLastUrl = item.backdrop;
+        heroLastPos = position;
+
+        tvHeroTitle.setText(item.name);
+        boolean hasRate = item.rate != null && !item.rate.isEmpty()
+                && !item.rate.equals("0") && !item.rate.equals("0.0");
+        tvHeroRate.setVisibility(hasRate ? View.VISIBLE : View.GONE);
+        if (hasRate) tvHeroRate.setText(item.rate);
+        StringBuilder meta = new StringBuilder();
+        if (item.genres != null && !item.genres.isEmpty()) meta.append(item.genres);
+        if (item.year != null && !item.year.isEmpty()) {
+            if (meta.length() > 0) meta.append(" · ");
+            meta.append(item.year);
+        }
+        meta.append(" · ").append(item.kind == TmdbApi.KIND_MOVIE ? "电影" : "剧集");
+        tvHeroMeta.setText(meta.toString());
+        tvHeroOverview.setVisibility(item.overview == null || item.overview.isEmpty() ? View.GONE : View.VISIBLE);
+        tvHeroOverview.setText(item.overview);
+
+        if (!same) {
+            heroImgIdx = 0;
+            stopHeroTicker();
+            Glide.with(this).asBitmap().load(ImgUtil.urlFor(item.backdrop)).centerCrop()
+                    .into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource,
+                                                    @Nullable Transition<? super Bitmap> transition) {
+                            if (!item.backdrop.equals(heroLastUrl)) return; // 已经换片了
+                            bgHero.setImageBitmap(resource);
+                        }
+
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+                        }
+                    });
+        }
+
+        // 一部片多张剧照轮播：剧照列表懒加载（首次展示该片拉一次），>= 2 张才开轮
+        if (item.images != null && item.images.size() > 1) {
+            startHeroTicker(item);
+        } else if (item.images == null) {
+            TmdbItem current = item;
+            TmdbApi.fetchImages(item, urls -> {
+                if (urls == null || urls.size() < 2) return; // 只有一张图就不轮
+                current.images = urls;
+                // 用户已经切走了就不开轮
+                if (heroShown && heroAdapter.get(heroLastPos) == current) startHeroTicker(current);
+            });
+        }
+
+        if (!heroShown) {
+            heroShown = true;
+            // 大图是主角：分类胶囊 + 海报墙整层收掉，不然大图只是垫底被盖住
+            contentLayout.animate().alpha(0f).setDuration(320)
+                    .withEndAction(() -> contentLayout.setVisibility(View.INVISIBLE)).start();
+            View[] layers = {bgHero, heroScrim, heroInfo, heroSwitcher};
+            for (View layer : layers) {
+                layer.setAlpha(0f);
+                layer.animate().alpha(1f).setDuration(320).start();
+            }
+        } else if (same) {
+            // 防止动画途中被 heroOff 打断后又回到同一张
+            bgHero.animate().alpha(1f).setDuration(240).start();
+            heroScrim.animate().alpha(1f).setDuration(240).start();
+            heroInfo.animate().alpha(1f).setDuration(240).start();
+        }
+    }
+
+    /** 开轮：8 秒切该片下一张剧照，交叉淡入淡出；按键会调 restartHeroTicker 重置计时 */
+    private void startHeroTicker(TmdbItem item) {
+        stopHeroTicker();
+        if (item == null || item.images == null || item.images.size() < 2) return;
+        heroTicker = new Runnable() {
+            @Override
+            public void run() {
+                if (!heroShown || item.images == null || item.images.size() < 2) return;
+                heroImgIdx = (heroImgIdx + 1) % item.images.size();
+                final String url = item.images.get(heroImgIdx);
+                Glide.with(HomeActivity.this).asBitmap().load(ImgUtil.urlFor(url)).centerCrop()
+                        .into(new CustomTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource,
+                                                        @Nullable Transition<? super Bitmap> transition) {
+                                if (!heroShown || !url.equals(item.images.get(heroImgIdx))) return;
+                                // 淡出 → 换图 → 淡入，避免硬切
+                                bgHero.animate().alpha(0f).setDuration(200)
+                                        .withEndAction(() -> {
+                                            if (!heroShown) return;
+                                            bgHero.setImageBitmap(resource);
+                                            bgHero.animate().alpha(1f).setDuration(320).start();
+                                        }).start();
+                            }
+
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) {
+                            }
+                        });
+                heroTickerHandler.postDelayed(this, HERO_TICK_MS);
+            }
+        };
+        heroTickerHandler.postDelayed(heroTicker, HERO_TICK_MS);
+    }
+
+    /** 按键把闲置计时归零（不动当前图，只推迟下一次切换） */
+    private void restartHeroTicker() {
+        if (heroTicker != null && heroShown) {
+            heroTickerHandler.removeCallbacks(heroTicker);
+            heroTickerHandler.postDelayed(heroTicker, HERO_TICK_MS);
+        }
+    }
+
+    private void stopHeroTicker() {
+        if (heroTicker != null) {
+            heroTickerHandler.removeCallbacks(heroTicker);
+            heroTicker = null;
+        }
+    }
+
+    /** 大图退场：焦点去了海报墙 / 分类胶囊 / 左栏，海报墙回归、露出模糊玻璃底 */
+    private void fadeOutHero() {
+        // 启动期程序化抢焦点（initData、配置加载等）会路过这里，没交互就不许退场
+        if (!heroShown || !userInteracted) return;
+        heroShown = false;
+        heroDismissed = true; // 用户离开过大图，本次会话数据晚到不再自动弹回
+        stopHeroTicker();
+        View[] layers = {bgHero, heroScrim, heroInfo, heroSwitcher};
+        for (View layer : layers) {
+            layer.animate().alpha(0f).setDuration(240).start();
+        }
+        // 海报墙回来（大图在场时被整层收掉了）
+        contentLayout.setVisibility(View.VISIBLE);
+        contentLayout.animate().alpha(1f).setDuration(240).start();
+    }
+
     private final Runnable mDataRunnable = new Runnable() {
         @Override
         public void run() {
@@ -1037,6 +1375,11 @@ public class HomeActivity extends BaseActivity {
             if (event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
                 showSiteSwitch();
             }
+            // 用户按过遥控器才算「真交互」：启动期一堆程序化抢焦点，
+            // 不能让它们触发大图退场（详见 fadeOutHero 的 userInteracted 门）
+            userInteracted = true;
+            // 大图在场时按键 = 有人在看，闲置计时归零，别跟人抢着换图
+            if (heroShown) restartHeroTicker();
 //            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
 //                if () {
 //

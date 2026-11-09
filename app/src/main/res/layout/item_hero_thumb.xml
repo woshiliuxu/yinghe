@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 右上角切换器的单张小图：88×50 宽幅，正好是 TMDB backdrop 的比例。
+     圆角与描边都来自 sel_hero_thumb，图片靠 clipToOutline 裁进圆角里。 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/vs_88"
+    android:layout_height="@dimen/vs_50"
+    android:layout_marginStart="@dimen/vs_6"
+    android:focusable="true"
+    android:clickable="true">
+
+    <ImageView
+        android:id="@+id/imgHeroThumb"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/sel_hero_thumb"
+        android:clipToOutline="true"
+        android:duplicateParentState="true"
+        android:scaleType="centerCrop" />
+</FrameLayout>

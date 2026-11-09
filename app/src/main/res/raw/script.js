@@ -99,6 +99,12 @@ function proxys() {
     doAction('proxys', { url: $('#diy_proxy_server').val() });
 }
 
+function tmdbToken() {
+    var token = $('#diy_tmdb_token').val().trim();
+    doAction('tmdb', { token: token });
+    if (!token) okToast('已清空，TMDB 大图已关闭');
+}
+
 function push() {
     if (!$('#push_url').val()) return warnToast('先粘贴播放地址');
     doAction('push', { url: $('#push_url').val() });
@@ -136,10 +142,12 @@ $(function () {
     // 品牌行已删，地址并入导航提示；页面顶部只留大标题
 
     // 恢复上次停留的页面；push.html / api.html 旧入口也各自直达
+    // TV 端二维码指向 /#config —— 带锚点时无视 localStorage，直达配置页
     var url = window.location.href;
     var saved = null;
     try { saved = localStorage.getItem('yhg_view'); } catch (e) { }
-    if (url.indexOf('push.html') > 0) switchView('Push');
+    if (url.indexOf('#config') >= 0) switchView('Config');
+    else if (url.indexOf('push.html') > 0) switchView('Push');
     else if (url.indexOf('api.html') > 0 || url.indexOf('all.html') > 0) switchView('Config');
     else if (saved === 'Push' || saved === 'Config' || saved === 'Search') switchView(saved);
     else switchView('Config');

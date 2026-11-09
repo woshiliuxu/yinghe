@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 评分胶囊：详情页 bg_rate_pill 的同款，这里只是小一号的引用壳。
+     单独一份是留给首页以后调整口径，不和详情页互相牵动。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <corners android:radius="8dp" />
+    <solid android:color="#F2EFE8" />
+</shape>

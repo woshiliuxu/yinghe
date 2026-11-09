@@ -32,6 +32,7 @@ import com.github.tvbox.osc.ui.dialog.HomeIconDialog;
 import com.github.tvbox.osc.ui.dialog.MediaSettingDialog;
 import com.github.tvbox.osc.ui.dialog.ResetDialog;
 import com.github.tvbox.osc.ui.dialog.SelectDialog;
+import com.github.tvbox.osc.ui.dialog.TmdbTokenDialog;
 import com.github.tvbox.osc.ui.dialog.XWalkInitDialog;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
@@ -110,8 +111,9 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvDebugOpen = findViewById(R.id.tvDebugOpen);
         tvDebugOpen.setText(Hawk.get(HawkConfig.DEBUG_OPEN, false) ? "开启" : "关闭");
         tvApi = findViewById(R.id.tvApi);
-        // 没有手动配置过（键不存在）时显示实际生效的内置默认源，而不是空白
-        tvApi.setText(Hawk.get(HawkConfig.API_URL, getString(R.string.app_source)));
+        // 纯壳原则：出厂不带默认源，没配置过就显示「未配置（扫码添加）」
+        String apiUrl = Hawk.get(HawkConfig.API_URL, "");
+        tvApi.setText(apiUrl.isEmpty() ? "未配置（扫码添加）" : apiUrl);
         // Home Section
         tvHomeApi = findViewById(R.id.tvHomeApi);
         tvHomeApi.setText(ApiConfig.get().getHomeSourceBean().getName());
@@ -173,7 +175,8 @@ public class ModelSettingFragment extends BaseLazyFragment {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
                         ((BaseActivity) mActivity).hideSystemUI(true);
-                        tvApi.setText(Hawk.get(HawkConfig.API_URL, getString(R.string.app_source)));
+                        String cur = Hawk.get(HawkConfig.API_URL, "");
+                        tvApi.setText(cur.isEmpty() ? "未配置（扫码添加）" : cur);
                     }
                 });
                 dialog.show();
@@ -230,6 +233,19 @@ public class ModelSettingFragment extends BaseLazyFragment {
                     }, sites, sites.indexOf(ApiConfig.get().getHomeSourceBean()));
                     dialog.show();
                 }
+            }
+        });
+        // TMDB 密钥：首页大图轮播的 token，空 = 未配置（大图不启用） -----------------
+        final TextView tvTmdb = findViewById(R.id.tvTmdb);
+        tvTmdb.setText(Hawk.get(HawkConfig.TMDB_TOKEN, "").isEmpty() ? "未配置" : "已配置");
+        findViewById(R.id.llTmdb).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FastClickCheckUtil.check(v);
+                TmdbTokenDialog dialog = new TmdbTokenDialog(mActivity);
+                dialog.onChanged = () -> tvTmdb.setText(
+                        Hawk.get(HawkConfig.TMDB_TOKEN, "").isEmpty() ? "未配置" : "已配置");
+                dialog.show();
             }
         });
         // Switch to show / hide source header --------------------------

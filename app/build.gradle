@@ -3,9 +3,9 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.yanzhenjie.andserver'
 
-def static buildTime() {
-    return new Date().format("yyyyMMdd_HHmm", TimeZone.getTimeZone("GMT+08:00"))
-}
+// 版本号唯一来源：改这里，tag 与 APK 元数据保持一致（发版流程见根目录 RELEASES.md）
+def appVerName = "0.11.6"
+def appVerCode = 116
 
 android {
     compileSdk 34
@@ -13,8 +13,8 @@ android {
     defaultConfig {
         applicationId 'com.github.tvbox.osc.tk'
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0.".concat(buildTime())
+        versionCode appVerCode
+        versionName appVerName
         multiDexEnabled true
         //设置room的Schema的位置
         javaCompileOptions {

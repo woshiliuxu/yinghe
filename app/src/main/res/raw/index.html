@@ -90,7 +90,7 @@
 
 				<div class="yhg-group-hd" onclick="toggleAdv()">
 					<span>高级选项</span>
-					<span class="yhg-group-hd__sub">直播源 · EPG · 代理</span>
+					<span class="yhg-group-hd__sub">直播源 · EPG · 代理 · TMDB</span>
 					<svg class="yhg-chev" id="advChev" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 						stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
 						<path d="M6 9.5l6 6 6-6" />
@@ -105,6 +105,11 @@
 					<div class="adv-row">
 						<input id="diy_epg_url" type="text" value="" placeholder="直播 EPG 地址" autocomplete="off" />
 						<button onclick="epg(); return false;">确定</button>
+					</div>
+					<div class="adv-row">
+						<input id="diy_tmdb_token" type="text" value="" placeholder="TMDB Token（首页大图，eyJ 开头）"
+							autocomplete="off" />
+						<button onclick="tmdbToken(); return false;">确定</button>
 					</div>
 					<div class="adv-row">
 						<input id="diy_proxy_server" type="text" value="" placeholder="socks 代理 IP:端口"

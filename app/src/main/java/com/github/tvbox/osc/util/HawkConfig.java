@@ -64,6 +64,9 @@ public class HawkConfig {
     public static final String SCREEN_DISPLAY = "screen_display";
     public static final String SEARCH_FILTER_KEY = "search_filter_key";
 
+    // TMDB（首页大图轮播）—— v4 Read Access Token，纯壳：只认用户在手机端配的，空 = 不启用
+    public static final String TMDB_TOKEN = "tmdb_token";
+
     // Live Settings
     public static final String LIVE_CHANNEL = "last_live_channel_name";
     public static final String LIVE_CHANNEL_GROUP = "last_live_channel_group_name";

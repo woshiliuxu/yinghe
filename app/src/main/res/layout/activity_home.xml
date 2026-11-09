@@ -24,7 +24,123 @@
         android:layout_height="match_parent"
         android:background="@drawable/scrim_backdrop" />
 
-    <!-- 左栏：上下 padding 故意不等。
+    <!-- ── TMDB 大图层（方案 A 影院首页）──
+         打开第一眼：TMDB w1280 剧照铺满、不模糊，底部渐变压暗托左下信息。
+         右上角切换器有焦点时这层淡入；焦点离开去海报墙时淡出，露出下面的模糊玻璃底。 -->
+    <ImageView
+        android:id="@+id/bgHero"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:scaleType="centerCrop" />
+
+    <View
+        android:id="@+id/heroScrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="@drawable/scrim_hero" />
+
+    <LinearLayout
+        android:id="@+id/heroInfo"
+        android:layout_width="@dimen/vs_0"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/vs_128"
+        android:layout_marginLeft="@dimen/vs_128"
+        android:layout_marginEnd="@dimen/vs_140"
+        android:layout_marginRight="@dimen/vs_140"
+        android:layout_marginBottom="@dimen/vs_24"
+        android:alpha="0"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <TextView
+            android:id="@+id/tvHeroTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@color/ui_text_1"
+            android:textSize="@dimen/ts_30"
+            android:textStyle="bold"
+            tools:text="沙丘 2" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/vs_10"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvHeroRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_hero_rate"
+                android:paddingStart="@dimen/vs_10"
+                android:paddingLeft="@dimen/vs_10"
+                android:paddingTop="@dimen/vs_2"
+                android:paddingRight="@dimen/vs_10"
+                android:paddingEnd="@dimen/vs_10"
+                android:paddingBottom="@dimen/vs_2"
+                android:singleLine="true"
+                android:textColor="#101115"
+                android:textSize="@dimen/ts_16"
+                android:textStyle="bold"
+                tools:text="8.2" />
+
+            <TextView
+                android:id="@+id/tvHeroMeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/vs_16"
+                android:layout_marginLeft="@dimen/vs_16"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="@color/ui_text_2"
+                android:textSize="@dimen/ts_18"
+                tools:text="科幻 / 冒险 · 2024 · 电影" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvHeroOverview"
+            android:layout_width="@dimen/vs_520"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/vs_10"
+            android:ellipsize="end"
+            android:lineSpacingExtra="2dp"
+            android:maxLines="2"
+            android:textColor="@color/ui_text_2"
+            android:textSize="@dimen/ts_16"
+            tools:text="保罗·厄崔迪携手契妮和弗雷曼人，对毁灭他家族的阴谋者展开报复……" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/vs_14"
+            android:text="@string/hero_hint"
+            android:textColor="@color/ui_text_3"
+            android:textSize="@dimen/ts_15" />
+    </LinearLayout>
+
+    <!-- ── 方案 B：封面切换器沿右缘竖排 ──
+         和大图层一起淡入淡出（Java 里加入 layers 数组）；
+         海报墙按右/按上都能进来，按左/按下回海报墙。
+         alpha=0 时仍可被系统焦点搜到（海报墙按右的自然入口），别改成 invisible。 -->
+    <com.owen.tvrecyclerview.widget.TvRecyclerView
+        android:id="@+id/heroSwitcher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/vs_24"
+        android:layout_marginRight="@dimen/vs_24"
+        android:alpha="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- ── 左栏：上下 padding 故意不等。
          视觉空隙统一是 20（logo 白块上缘距顶边 20 / wifi 图标下缘距底边 20）。
          logo 是满壳实色块，边缘即视觉边缘，所以 paddingTop = 20；
          wifi 是 50 的壳里只露 22 的图标，图标已内缩 14，外壳只要再让 6，加起来才是 20。
@@ -246,6 +362,10 @@
             android:textColor="@color/ui_text_1"
             android:textSize="@dimen/ts_30" />
 
+        <!-- 方案 B：切换器挪到屏幕右缘竖排（见 heroInfo 后面的 heroSwitcher） -->
+
+        <!-- 源名与日期从顶栏撤下（大图层的信息已足够）；
+             视图保留但隐藏，Java 里对它们的赋值逻辑全部不用改 -->
         <TextView
             android:id="@+id/tvSrc"
             android:layout_width="wrap_content"
@@ -262,6 +382,7 @@
             android:singleLine="true"
             android:textColor="@color/ui_text_3"
             android:textSize="@dimen/ts_20"
+            android:visibility="gone"
             tools:text="盒子迷MAX" />
 
         <TextView
@@ -276,6 +397,7 @@
             android:textAlignment="gravity"
             android:textColor="@color/ui_text_3"
             android:textSize="@dimen/ts_20"
+            android:visibility="gone"
             tools:text="11-04 周三 16:30" />
 
     </LinearLayout>
